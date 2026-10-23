@@ -1,15 +1,30 @@
 {
   "identitas": {
-    "judul": "[JUDUL SKRIPSI]",
-    "nama": "[NAMA MAHASISWA]",
-    "nim": "[NIM]",
-    "programStudi": "[PROGRAM STUDI]",
-    "fakultas": "[FAKULTAS]",
-    "universitas": "[NAMA UNIVERSITAS]",
+    "judul": "[JUDUL NASKAH PUBLIKASI ILMIAH MAHASISWA]",
+    "nama": "[NAMA LENGKAP MAHASISWA]",
+    "nim": "[NIM MAHASISWA]",
+    "programStudi": "[PROGRAM STUDI TEKNIK INFORMATIKA]",
+    "fakultas": "[FAKULTAS KOMUNIKASI DAN INFORMATIKA]",
+    "universitas": "[UNIVERSITAS MUHAMMADIYAH SURAKARTA]",
     "tahun": "[TAHUN]",
-    "pembimbing": "[NAMA DOSEN PEMBIMBING]",
-    "nidn": "[NIDN ATAU NIK PEMBIMBING]"
+    "pembimbing": "[NAMA DOSEN PEMBIMBING BESERTA GELAR]",
+    "nidn": "[NIDN PEMBIMBING]",
+    "penguji1": "[NAMA DOSEN PENGUJI 1 BESERTA GELAR]",
+    "penguji2": "[NAMA DOSEN PENGUJI 2 BESERTA GELAR]",
+    "hariUjian": "[HARI UJIAN, misal: Senin]",
+    "tanggalUjian": "[TANGGAL UJIAN, misal: 20 Oktober 2024]",
+    "dekan": "[NAMA DEKAN FAKULTAS BESERTA GELAR]",
+    "nidnDekan": "[NIDN DEKAN]",
+    "kaprodi": "[NAMA KETUA PROGRAM STUDI BESERTA GELAR]",
+    "nidnKaprodi": "[NIDN KAPRODI]"
   },
+  "abstrak": {
+    "indonesia": "[Tuliskan ringkasan abstrak Bahasa Indonesia dalam satu paragraf (umumnya 150-250 kata). Memuat uraian singkat latar belakang, masalah dan tujuan penelitian, metode/pendekatan yang digunakan, serta hasil utama dan kesimpulan.]",
+    "kataKunci": "[kata kunci 1, kata kunci 2, kata kunci 3 (3-5 kata/frasa dipisahkan koma atau titik koma)]",
+    "english": "[Provide the English translation of the abstract in a single paragraph (150-250 words). Outlines research context, problem statement, objectives, proposed methodology, and key results/contributions.]",
+    "keywords": "[keyword 1, keyword 2, keyword 3 (3-5 terms separated by semicolons or commas)]"
+  },
+  "persantunan": "[Penulis menyampaikan ucapan terima kasih kepada pimpinan fakultas, program studi, dosen pembimbing, penguji, instansi/laboratorium terkait, serta semua pihak yang berkontribusi dalam pelaksanaan penelitian dan penyusunan publikasi ilmiah ini.]",
   "citationStyle": "apa",
   "chapters": [
     {
@@ -20,7 +35,7 @@
           "blocks": [
             {
               "type": "paragraph",
-              "text": "[Uraikan konteks umum, kondisi atau masalah yang ditemukan, bukti pendukung dari sumber yang dapat diverifikasi, kesenjangan penelitian, dan alasan pentingnya penelitian ini. Susun secara logis dari umum ke khusus.]"
+              "text": "[Uraikan konteks umum topik, fenomena atau tantangan yang dihadapi, data/fakta pendukung, celah riset (research gap), serta urgensi penelitian. Format sitasi dapat menggunakan token {{sourceId}} seperti {{sumber-1}} atau teks sitasi langsung.]"
             }
           ]
         },
@@ -31,8 +46,8 @@
               "type": "list",
               "ordered": true,
               "items": [
-                "[Tuliskan pertanyaan penelitian pertama.]",
-                "[Tuliskan pertanyaan penelitian berikutnya.]"
+                "[Tuliskan pertanyaan penelitian pertama secara spesifik dan terarah.]",
+                "[Tuliskan pertanyaan penelitian kedua.]"
               ]
             }
           ]
@@ -44,8 +59,8 @@
               "type": "list",
               "ordered": false,
               "items": [
-                "[Jelaskan batasan objek, ruang lingkup, variabel, data, atau periode penelitian.]",
-                "[Tambahkan batasan lain yang diperlukan.]"
+                "[Batasan objek, ruang lingkup domain, atau variabel yang diteliti.]",
+                "[Batasan dataset, platform pengujian, atau parameter lingkungan eksperimen.]"
               ]
             }
           ]
@@ -57,8 +72,8 @@
               "type": "list",
               "ordered": true,
               "items": [
-                "[Tuliskan tujuan yang menjawab rumusan masalah pertama.]",
-                "[Tuliskan tujuan berikutnya.]"
+                "[Tujuan konkret yang menjawab rumusan masalah pertama.]",
+                "[Tujuan konkret yang menjawab rumusan masalah kedua.]"
               ]
             }
           ]
@@ -68,7 +83,7 @@
           "blocks": [
             {
               "type": "paragraph",
-              "text": "Manfaat teoritis: [Jelaskan kontribusi penelitian bagi ilmu atau penelitian selanjutnya.]\n\nManfaat praktis: [Jelaskan pihak yang dapat menggunakan hasil penelitian dan bagaimana hasil tersebut dapat dimanfaatkan.]"
+              "text": "Manfaat teoritis: [Jelaskan kontribusi bagi pengembangan ilmu pengetahuan dan literatur terkait.]\n\nManfaat praktis: [Jelaskan manfaat aplikatif bagi pengembang, industri, institusi, atau masyarakat umum.]"
             }
           ]
         }
@@ -82,21 +97,42 @@
           "blocks": [
             {
               "type": "paragraph",
-              "text": "[Jelaskan teori dan konsep utama yang relevan dengan topik. Definisikan istilah penting, bandingkan pandangan sumber ilmiah, dan hubungkan teori dengan variabel atau fokus penelitian. Gunakan sitasi dari sumber yang benar-benar ada.]"
+              "text": "[Uraikan kerangka teoritis utama yang mendasari penelitian, konsep-konsep kunci, dan argumen ilmiah yang relevan.]"
+            }
+          ],
+          "subsections": [
+            {
+              "title": "[Teori atau Konsep Kunci Pertama]",
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "text": "[Definisi, prinsip kerja, formulasi, atau arsitektur konsep pertama. Subbab ini bernomor 2.1.1.]"
+                }
+              ]
+            },
+            {
+              "title": "[Teori atau Konsep Kunci Kedua]",
+              "blocks": [
+                {
+                  "type": "paragraph",
+                  "text": "[Definisi, prinsip kerja, formulasi, atau arsitektur konsep kedua. Subbab ini bernomor 2.1.2.]"
+                }
+              ]
             }
           ]
         },
         {
-          "title": "Penelitian Terdahulu",
+          "title": "Penelitian Terdahulu dan Celah Riset",
           "blocks": [
             {
               "type": "table",
+              "caption": "Tabel 2.1 Ringkasan Pemetaan Penelitian Terdahulu",
               "tableInputMode": "text",
-              "tableText": "Penulis dan Tahun | Fokus Penelitian | Metode | Hasil Utama | Perbedaan atau Celah\n[Nama penulis, tahun] | [Fokus] | [Metode] | [Temuan berdasarkan artikel] | [Perbedaan/celah]\n[Nama penulis, tahun] | [Fokus] | [Metode] | [Temuan berdasarkan artikel] | [Perbedaan/celah]"
+              "tableText": "Peneliti & Tahun | Fokus Penelitian | Metode/Model | Hasil Utama | Celah Riset\n[Peneliti A, 2023] | [Fokus penelitian] | [Metode yang dipakai] | [Temuan utama artikel] | [Keterbatasan/celah]\n[Peneliti B, 2024] | [Fokus penelitian] | [Metode yang dipakai] | [Temuan utama artikel] | [Keterbatasan/celah]"
             },
             {
               "type": "paragraph",
-              "text": "[Sintesis persamaan dan perbedaan penelitian terdahulu. Jelaskan celah penelitian secara spesifik dan posisi penelitian ini, tanpa mengada-adakan publikasi atau temuan.]"
+              "text": "[Sintesis komparatif dari penelitian-penelitian terdahulu yang menegaskan novelty (kebaruan) dan posisi keunggulan penelitian ini dibanding studi sebelumnya.]"
             }
           ]
         },
@@ -105,23 +141,23 @@
           "blocks": [
             {
               "type": "paragraph",
-              "text": "[Jelaskan hubungan logis antara masalah, teori, variabel/fokus, metode, dan hasil yang diharapkan. Jika penelitian tidak menggunakan hipotesis, jangan membuat hipotesis.]"
+              "text": "[Penjelasan alur logis yang menghubungkan permasalahan, landasan teori, pendekatan pemecahan masalah, dan hasil/luaran yang diharapkan.]"
             },
             {
               "type": "image",
               "dataUrl": "",
-              "caption": "[Unggah diagram kerangka pemikiran pada aplikasi, lalu isi keterangan gambar.]"
+              "caption": "Gambar 2.1 Diagram Kerangka Pemikiran Penelitian"
             }
           ]
         },
         {
-          "title": "Hipotesis Penelitian (jika diperlukan)",
+          "title": "Hipotesis Penelitian (jika relevan)",
           "blocks": [
             {
               "type": "list",
               "ordered": true,
               "items": [
-                "[Tuliskan hipotesis yang dapat diuji dan sesuai dengan teori serta rancangan penelitian, atau hapus subbab ini jika tidak relevan.]"
+                "[Hipotesis yang akan diuji melalui eksperimen/analisis statistik, atau hapus subbab ini jika penelitian bersifat kualitatif/eksploratif.]"
               ]
             }
           ]
@@ -129,105 +165,163 @@
       ]
     },
     {
-      "title": "Metodologi Penelitian",
+      "title": "Metode Penelitian",
       "sections": [
         {
-          "title": "Desain Penelitian",
+          "title": "Desain Penelitian dan Arsitektur Sistem",
           "blocks": [
             {
               "type": "paragraph",
-              "text": "[Jelaskan jenis dan desain penelitian, pendekatan yang digunakan, alasan pemilihannya, serta tahapan utama penelitian.]"
+              "text": "[Jelaskan rancangan penelitian, pendekatan yang digunakan (eksperimental/kuantitatif/rekayasa perangkat lunak), serta arsitektur keseluruhan sistem yang dibangun.]"
             }
           ]
         },
         {
-          "title": "Objek, Subjek, dan Data Penelitian",
+          "title": "Objek, Sumber Data, dan Lingkungan Uji",
           "blocks": [
             {
               "type": "paragraph",
-              "text": "[Jelaskan objek/subjek penelitian, populasi dan sampel bila relevan, sumber data, kriteria pemilihan, serta cara memperoleh data.]"
+              "text": "[Jelaskan objek penelitian, populasi/sampel, karakteristik data atau dataset, cara akuisisi/preprocessing data, dan spesifikasi perangkat keras/lunak yang digunakan.]"
             }
           ]
         },
         {
-          "title": "Variabel atau Fokus Penelitian",
+          "title": "Variabel dan Metrik Evaluasi",
           "blocks": [
             {
               "type": "table",
+              "caption": "Tabel 3.1 Definisi Operasional Variabel dan Metrik Evaluasi",
               "tableInputMode": "text",
-              "tableText": "Variabel/Fokus | Definisi Operasional | Indikator | Sumber atau Instrumen\n[Nama variabel/fokus] | [Definisi yang terukur] | [Indikator] | [Sumber/instrumen]"
+              "tableText": "Variabel/Metrik | Definisi Operasional | Formulasi Rumus (LaTeX) | Arah Kinerja\nTask Success Rate (TSR) | Persentase tugas selesai sesuai tujuan | $\\text{TSR} = \\frac{N_{\\text{sukses}}}{N_{\\text{tugas}}} \\times 100\\%$ | Lebih tinggi lebih baik\nHallucination Rate (HR) | Proporsi klaim tidak berdasar katalog | $\\text{HR} = \\frac{K_{\\text{salah}}}{K_{\\text{klaim}}} \\times 100\\%$ | Lebih rendah lebih baik"
             }
           ]
         },
         {
-          "title": "Instrumen atau Komponen Penelitian",
+          "title": "Diagram Alir Prosedur Penelitian",
           "blocks": [
             {
-              "type": "table",
-              "tableInputMode": "text",
-              "tableText": "Komponen/Instrumen | Fungsi | Spesifikasi atau Prosedur\n[Nama komponen/instrumen] | [Fungsi dalam penelitian] | [Spesifikasi/prosedur]"
+              "type": "paragraph",
+              "text": "[Uraikan tahapan pelaksanaan penelitian secara runtut mulai dari tahap inisiasi, perancangan, eksperimen, hingga evaluasi akhir sebagaimana digambarkan pada diagram alir berikut.]"
+            },
+            {
+              "type": "flowchart",
+              "flowchartTitle": "Diagram Alir Prosedur Penelitian",
+              "caption": "Gambar 3.1 Diagram Alir Prosedur Penelitian",
+              "flowchartText": "digraph G {\n    graph [splines=ortho, nodesep=0.6, ranksep=0.6, fontname=\"Arial\"];\n    node [shape=box, style=filled, fillcolor=\"#cce5ff\", fontname=\"Arial\", fontsize=11, width=1.8];\n    edge [fontname=\"Arial\", fontsize=10];\n\n    A [label=\"Mulai\", shape=box, style=\"rounded,filled\", fillcolor=\"#ffcccc\"];\n    B [label=\"Studi Literatur &\\nIdentifikasi Masalah\"];\n    C [label=\"Pengumpulan Data\\n& Preprocessing\"];\n    D [label=\"Perancangan &\\nImplementasi Sistem\"];\n    E [label=\"Pengujian Sistem /\\nEksperimen\"];\n    F [label=\"Hasil Memenuhi\\nKriteria?\", shape=diamond, fillcolor=\"#ffebcc\"];\n    G [label=\"Analisis Hasil &\\nPembahasan\"];\n    H [label=\"Selesai\", shape=box, style=\"rounded,filled\", fillcolor=\"#ffcccc\"];\n\n    A -> B -> C -> D -> E -> F;\n    F -> D [label=\" Tidak (Iterasi/Evaluasi Ulang) \"];\n    F -> G [label=\" Ya \"];\n    G -> H;\n}"
             }
           ]
         },
         {
-          "title": "Prosedur Penelitian",
+          "title": "Teknik Pengujian dan Analisis Data",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "[Jelaskan prosedur pengujian, skenario uji, teknik analisis data (statistik deskriptif/inferensial, matriks konfusi, benchmark perbandingan), serta kriteria validasi.]"
+            },
+            {
+              "type": "chart",
+              "chartTitle": "Perbandingan Baseline dan Target Evaluasi",
+              "chartType": "bar-comparison",
+              "chartInputMode": "text",
+              "chartData": "Kategori | Model Baseline | Model Usulan\nAkurasi (%) | 78.5 | 92.4\nPresisi (%) | 75.0 | 90.1\nRecall (%) | 81.2 | 93.8",
+              "caption": "Gambar 3.2 Grafik Perbandingan Metrik Baseline dan Model Usulan"
+            }
+          ]
+        },
+        {
+          "title": "Etika dan Pengelolaan Data Penelitian",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "[Jelaskan aspek etika penelitian meliputi persetujuan partisipan, anonymization/pseudonimisasi data, izin pemakaian API/dataset, dan perlindungan privasi data.]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Hasil dan Pembahasan",
+      "sections": [
+        {
+          "title": "Hasil Eksperimen dan Pengujian",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "[Sajikan data empiris hasil pengujian dan eksperimen yang diperoleh. Tampilkan tabel komparasi performa dan grafik hasil pengukuran secara objektif.]"
+            },
+            {
+              "type": "table",
+              "caption": "Tabel 4.1 Rekapitulasi Hasil Pengujian Performa Sistem",
+              "tableInputMode": "text",
+              "tableText": "Skenario Uji | Jumlah Data | Waktu Respon (detik) | Tingkat Keberhasilan (%)\nSkenario 1 (Uji Ringan) | 100 | 0.85 | 98.0\nSkenario 2 (Uji Sedang) | 500 | 1.42 | 95.6\nSkenario 3 (Uji Beban Penuh) | 1000 | 2.10 | 92.4"
+            },
+            {
+              "type": "chart",
+              "chartTitle": "Distribusi Keberhasilan Eksekusi",
+              "chartType": "pie",
+              "chartInputMode": "text",
+              "chartData": "Berhasil | 92\nPerlu Perbaikan | 6\nGagal | 2",
+              "caption": "Gambar 4.1 Proporsi Hasil Pengujian Sistem"
+            }
+          ]
+        },
+        {
+          "title": "Pembahasan Komparatif dan Temuan Utama",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "[Diskusikan interpretasi temuan ilmiah: mengapa model/metode yang diusulkan bekerja lebih baik atau memiliki kelemahan tertentu? Hubungkan temuan dengan teori pada Bab 2 dan studi terdahulu {{sumber-1}}. Jelaskan implikasi hasil terhadap permasalahan penelitian.]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Penutup",
+      "sections": [
+        {
+          "title": "Kesimpulan",
           "blocks": [
             {
               "type": "list",
               "ordered": true,
               "items": [
-                "[Tahap persiapan dan penetapan data atau sampel.]",
-                "[Tahap pengumpulan atau pelaksanaan eksperimen.]",
-                "[Tahap pengolahan, analisis, dan pemeriksaan hasil.]"
+                "[Kesimpulan pertama yang menjawab rumusan masalah dan tujuan penelitian pertama berdasarkan fakta empiris yang diperoleh.]",
+                "[Kesimpulan kedua yang menjawab rumusan masalah dan tujuan penelitian kedua.]"
               ]
-            },
-            {
-              "type": "paragraph",
-              "text": "[Uraikan rincian prosedur yang perlu dijelaskan dalam bentuk narasi.]"
             }
           ]
         },
         {
-          "title": "Teknik Analisis Data",
+          "title": "Saran",
           "blocks": [
             {
-              "type": "paragraph",
-              "text": "[Jelaskan teknik analisis untuk setiap rumusan masalah atau variabel, termasuk perangkat/metode yang digunakan dan dasar interpretasi hasil. Jangan mencantumkan hasil penelitian yang belum diperoleh.]"
-            },
-            {
-              "type": "chart",
-              "chartTitle": "[Judul grafik rencana atau hasil yang sudah tersedia]",
-              "chartType": "bar",
-              "chartInputMode": "text",
-              "chartData": "[Kategori 1] | 0\n[Kategori 2] | 0",
-              "caption": "[Ganti kategori dan angka dengan data yang benar sebelum menghasilkan dokumen.]"
-            }
-          ]
-        },
-        {
-          "title": "Etika Penelitian (jika relevan)",
-          "blocks": [
-            {
-              "type": "paragraph",
-              "text": "[Jelaskan persetujuan partisipan, perlindungan identitas, izin penggunaan data, dan langkah etis lain yang relevan. Hapus subbab ini jika tidak diperlukan.]"
+              "type": "list",
+              "ordered": false,
+              "items": [
+                "[Saran konkret untuk pengembangan arsitektur, metode, atau integrasi sistem berikutnya.]",
+                "[Saran penambahan variasi dataset, pengujian jangka panjang, atau cakupan domain yang lebih luas.]"
+              ]
             }
           ]
         }
       ]
     }
   ],
-  "referensi": [],
+  "referensi": [
+    "Yao, S., Yu, D., Zhao, J., Shafran, I., Griffiths, T. L., Cao, Y., & Narasimhan, K. (2023). Tree of thoughts: Deliberate problem solving with large language models. Advances in Neural Information Processing Systems, 36, 11809-11822."
+  ],
   "sources": [
     {
       "id": "sumber-1",
-      "title": "[Judul artikel atau buku]",
-      "authors": "[Nama Penulis 1; Nama Penulis 2]",
-      "year": "[TAHUN]",
-      "journal": "[Nama jurnal atau penerbit]",
-      "volume": "[VOLUME]",
-      "issue": "[NOMOR]",
-      "pages": "[HALAMAN]",
-      "doi": "[DOI, jika tersedia]"
+      "title": "Tree of Thoughts: Deliberate Problem Solving with Large Language Models",
+      "authors": "Yao, S.; Yu, D.; Zhao, J.; Shafran, I.; Griffiths, T. L.; Cao, Y.; Narasimhan, K.",
+      "year": "2023",
+      "journal": "Advances in Neural Information Processing Systems",
+      "volume": "36",
+      "issue": "",
+      "pages": "11809-11822",
+      "doi": "10.48550/arXiv.2305.10601"
     }
   ]
 }

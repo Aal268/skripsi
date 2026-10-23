@@ -282,15 +282,21 @@ def cited_sources(chapters, sources):
     sources_by_id = {source.get("id"): source for source in sources if source.get("id")}
     ordered = []
     seen = set()
+
+    def collect_section(section):
+        for block in section.get("blocks", []):
+            if block.get("type") != "paragraph":
+                continue
+            for source_id in CITATION_PATTERN.findall(block.get("text", "")):
+                if source_id in sources_by_id and source_id not in seen:
+                    ordered.append(sources_by_id[source_id])
+                    seen.add(source_id)
+        for subsection in section.get("subsections", []):
+            collect_section(subsection)
+
     for chapter in chapters:
         for section in chapter.get("sections", []):
-            for block in section.get("blocks", []):
-                if block.get("type") != "paragraph":
-                    continue
-                for source_id in CITATION_PATTERN.findall(block.get("text", "")):
-                    if source_id in sources_by_id and source_id not in seen:
-                        ordered.append(sources_by_id[source_id])
-                        seen.add(source_id)
+            collect_section(section)
     return ordered
 
 

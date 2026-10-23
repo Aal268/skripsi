@@ -12,6 +12,18 @@
     href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$']],
+        displayMath: [['$$', '$$']]
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 
 <body>
@@ -49,17 +61,19 @@
 
       <nav class="nav" id="sectionNav">
         <button class="nav-item active" data-target="identitas"><span>01</span>Identitas</button>
-        <button class="nav-item" data-target="bab"><span>02</span>Bab & Subbab</button>
+        <button class="nav-item" data-target="abstrak"><span>02</span>Abstrak</button>
+        <button class="nav-item" data-target="bab"><span>03</span>Naskah Publikasi</button>
         <div class="chapter-nav-section">
-          <div class="chapter-nav-heading"><span>STRUKTUR BAB</span><span id="chapterCount"></span></div>
+          <div class="chapter-nav-heading"><span>STRUKTUR NASKAH</span><span id="chapterCount"></span></div>
           <div class="chapter-nav-tools">
-            <label class="sr-only" for="chapterSearch">Cari bab atau subbab</label>
-            <input id="chapterSearch" type="search" placeholder="Cari bab / subbab">
+            <label class="sr-only" for="chapterSearch">Cari bagian atau sub-heading</label>
+            <input id="chapterSearch" type="search" placeholder="Cari bagian...">
           </div>
           <div class="chapter-nav" id="chapterNav" aria-label="Daftar bab dan subbab"></div>
         </div>
-        <button class="nav-item" data-target="pustaka"><span>03</span>Referensi</button>
-        <button class="nav-item" data-target="tools"><span>04</span>Data & Backup</button>
+        <button class="nav-item" data-target="persantunan"><span>04</span>Persantunan</button>
+        <button class="nav-item" data-target="pustaka"><span>05</span>Daftar Pustaka</button>
+        <button class="nav-item" data-target="tools"><span>06</span>Data & Backup</button>
       </nav>
 
       <div class="sidebar-tip">
@@ -131,13 +145,85 @@
           </div>
 
           <div class="field">
-            <label for="pembimbing">Dosen Pembimbing</label>
-            <input id="pembimbing" data-key="identitas.pembimbing" type="text" placeholder="Opsional">
+            <label for="pembimbing">Dosen Pembimbing (Ketua Dewan Penguji)</label>
+            <input id="pembimbing" data-key="identitas.pembimbing" type="text" placeholder="Dr. Dosen Pembimbing, M.Sc.">
           </div>
 
           <div class="field">
-            <label for="nidn">NIDN / NIK Pembimbing</label>
-            <input id="nidn" data-key="identitas.nidn" type="text" placeholder="Opsional">
+            <label for="nidn">NIDN Pembimbing</label>
+            <input id="nidn" data-key="identitas.nidn" type="text" placeholder="123">
+          </div>
+
+          <div class="field">
+            <label for="penguji1">Anggota I Dewan Penguji</label>
+            <input id="penguji1" data-key="identitas.penguji1" type="text" placeholder="Dosen Penguji, S. Pd. M.Hum.">
+          </div>
+
+          <div class="field">
+            <label for="penguji2">Anggota II Dewan Penguji</label>
+            <input id="penguji2" data-key="identitas.penguji2" type="text" placeholder="Dr. Dosen Penguji, M. Ed.">
+          </div>
+
+          <div class="field">
+            <label for="hariUjian">Hari Ujian Pendadaran</label>
+            <input id="hariUjian" data-key="identitas.hariUjian" type="text" placeholder="Senin">
+          </div>
+
+          <div class="field">
+            <label for="tanggalUjian">Tanggal Ujian Pendadaran</label>
+            <input id="tanggalUjian" data-key="identitas.tanggalUjian" type="text" placeholder="20 Oktober 2023">
+          </div>
+
+          <div class="field">
+            <label for="dekan">Nama Dekan</label>
+            <input id="dekan" data-key="identitas.dekan" type="text" placeholder="Prof. Dr. Nama Dekan">
+          </div>
+
+          <div class="field">
+            <label for="nidnDekan">NIDN Dekan</label>
+            <input id="nidnDekan" data-key="identitas.nidnDekan" type="text" placeholder="0601017001">
+          </div>
+
+          <div class="field">
+            <label for="kaprodi">Ketua Program Studi</label>
+            <input id="kaprodi" data-key="identitas.kaprodi" type="text" placeholder="Prof. Dr. Nama Kaprodi">
+          </div>
+
+          <div class="field">
+            <label for="nidnKaprodi">NIDN Ketua Program Studi</label>
+            <input id="nidnKaprodi" data-key="identitas.nidnKaprodi" type="text" placeholder="0602028001">
+          </div>
+        </div>
+      </section>
+
+      <section class="form-section" id="abstrak">
+        <div class="section-heading">
+          <div>
+            <span class="section-number">02</span>
+            <h2>Abstrak & Abstract</h2>
+          </div>
+          <p>Isi ringkasan tujuan, metode, dan hasil atau kontribusi. Untuk proposal, tuliskan metode yang direncanakan tanpa mengarang hasil.</p>
+        </div>
+        <div class="card stack">
+          <div class="field">
+            <label for="abstrakIndonesia">Abstrak (Bahasa Indonesia)</label>
+            <textarea id="abstrakIndonesia" data-key="abstrak.indonesia" rows="8"></textarea>
+            <div class="field-meta"><span>Umumnya 150–250 kata; satu paragraf.</span><span class="counter" data-for="abstrakIndonesia"></span></div>
+          </div>
+          <div class="field">
+            <label for="kataKunci">Kata kunci</label>
+            <input id="kataKunci" data-key="abstrak.kataKunci" type="text">
+            <div class="field-meta"><span>3–5 istilah, pisahkan dengan titik koma.</span></div>
+          </div>
+          <div class="field">
+            <label for="abstrakEnglish">Abstract (English)</label>
+            <textarea id="abstrakEnglish" data-key="abstrak.english" rows="8"></textarea>
+            <div class="field-meta"><span>English version of the Indonesian abstract; generally 150–250 words.</span><span class="counter" data-for="abstrakEnglish"></span></div>
+          </div>
+          <div class="field">
+            <label for="keywords">Keywords</label>
+            <input id="keywords" data-key="abstrak.keywords" type="text">
+            <div class="field-meta"><span>Use 3–5 terms separated by semicolons.</span></div>
           </div>
         </div>
       </section>
@@ -145,23 +231,41 @@
       <section class="form-section" id="bab">
         <div class="section-heading">
           <div>
-            <span class="section-number">02</span>
-            <h2>Bab & Subbab</h2>
+            <span class="section-number">03</span>
+            <h2>Struktur Bagian Naskah Publikasi</h2>
           </div>
-          <p>Susun struktur dokumen dan tambahkan paragraf, daftar, gambar, atau tabel sesuai kebutuhan.</p>
+          <p>Susun struktur naskah (1. Pendahuluan, 2. Metode, 3. Hasil dan Pembahasan, 4. Penutup) sesuai pedoman.</p>
         </div>
         <div id="chaptersEditor" class="chapters-editor"></div>
-        <button class="btn btn-primary add-chapter-btn" id="addChapter" type="button">+ Tambah Bab</button>
+        <button class="btn btn-primary add-chapter-btn" id="addChapter" type="button">+ Tambah Bagian</button>
+      </section>
+
+      <!-- PERSANTUNAN -->
+      <section class="form-section" id="persantunan">
+        <div class="section-heading">
+          <div>
+            <span class="section-number">04</span>
+            <h2>Persantunan (Acknowledgements)</h2>
+          </div>
+          <p>Jika diperlukan, ucapan persantunan dapat disertakan kepada pihak-pihak yang telah memberi bantuan untuk penelitian skripsi dan penulisan artikel ilmiah.</p>
+        </div>
+        <div class="card stack">
+          <div class="field">
+            <label for="persantunanInput">Teks Persantunan</label>
+            <textarea id="persantunanInput" data-key="persantunan" rows="4" placeholder="Penulis mengucapkan terima kasih kepada..."></textarea>
+            <div class="field-meta"><span>Ditempatkan tepat sebelum Daftar Pustaka sesuai pedoman.</span></div>
+          </div>
+        </div>
       </section>
 
       <!-- REFERENCES -->
       <section class="form-section" id="pustaka">
         <div class="section-heading">
           <div>
-            <span class="section-number">03</span>
-            <h2>Pustaka & Sitasi</h2>
+            <span class="section-number">05</span>
+            <h2>Daftar Pustaka & Sitasi</h2>
           </div>
-          <p>Impor PDF jurnal untuk mengisi metadata otomatis dan langsung menambahkannya ke daftar pustaka.</p>
+          <p>Gunakan gaya sitasi APA (atau IEEE) dengan reference manager.</p>
         </div>
 
         <div class="card stack citation-library">
@@ -289,6 +393,9 @@
     </div>
   </div>
 
+  <script src="/assets/viz.js"></script>
+  <script src="/assets/full.render.js"></script>
+  <script src="/assets/mermaid.min.js"></script>
   <script src="/app.js"></script>
 </body>
 
