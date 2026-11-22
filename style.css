@@ -24,6 +24,65 @@
   --shadow: 0 20px 60px rgba(0, 0, 0, .28);
 }
 
+/* Math Equation Styling */
+.math-expr {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  font-family: "Cambria Math", "Times New Roman", serif;
+  font-size: 1.05em;
+  padding: 0 2px;
+  white-space: nowrap;
+  flex-wrap: nowrap;
+}
+.m-frac {
+  display: inline-flex;
+  flex-direction: column;
+  vertical-align: middle;
+  text-align: center;
+  padding: 0 4px;
+}
+.m-num {
+  border-bottom: 1.5px solid currentColor;
+  padding-bottom: 1px;
+  line-height: 1.15;
+  font-size: 0.9em;
+}
+.m-den {
+  padding-top: 1px;
+  line-height: 1.15;
+  font-size: 0.9em;
+}
+.m-text {
+  font-family: inherit;
+  font-style: normal;
+  white-space: nowrap;
+}
+.m-sum {
+  display: inline-flex;
+  flex-direction: column;
+  vertical-align: middle;
+  text-align: center;
+  padding: 0 3px;
+  line-height: 1;
+}
+.m-op-symbol {
+  font-size: 1.35em;
+  line-height: 0.9;
+  font-family: "Cambria Math", serif;
+  display: block;
+}
+.m-sub-bound {
+  font-size: 0.7em;
+  line-height: 1;
+  display: block;
+}
+.m-sup-bound {
+  font-size: 0.7em;
+  line-height: 1;
+  display: block;
+}
+
 * {
   box-sizing: border-box
 }
@@ -395,6 +454,11 @@ body:before {
 .chapter-subnav-link {
   padding-left: 9px;
   font-size: 9px
+}
+
+.chapter-subsubnav-link {
+  padding-left: 20px;
+  font-size: 8px
 }
 
 .chapter-nav-empty {
@@ -789,6 +853,12 @@ select:focus {
   border-top: 1px solid var(--line);
   border-left: 2px solid rgba(99, 91, 255, .22);
   scroll-margin-top: 94px
+}
+
+.nested-subchapter-card {
+  margin-left: 12px;
+  padding-left: 14px;
+  border-left-color: rgba(99, 91, 255, .14)
 }
 
 .subchapter-heading {
@@ -1456,22 +1526,29 @@ code {
 .document-preview {
   min-height: 0;
   overflow: auto;
-  padding: 20px;
-  background: #eceef2
+  padding: 30px 20px;
+  background: #d8dbe0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
 }
 
 .preview-page {
-  width: min(100%, 760px);
-  min-height: 720px;
-  margin: 0 auto 18px;
-  padding: 68px 72px;
-  background: #fff;
+  width: 210mm;
+  min-height: 297mm;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 30mm 30mm 30mm 40mm; /* A4 Margin: Atas 3cm, Kanan 3cm, Bawah 3cm, Kiri 4cm */
+  background: #ffffff;
   color: #171717;
-  box-shadow: 0 6px 24px rgba(20, 24, 38, .12);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.08);
   font-family: "Times New Roman", serif;
   font-size: 12pt;
   line-height: 1.5;
-  overflow-wrap: anywhere
+  box-sizing: border-box;
+  position: relative;
+  overflow-wrap: anywhere;
 }
 
 .preview-cover {
@@ -1587,6 +1664,10 @@ code {
   padding-left: 28px
 }
 
+.preview-toc-list .preview-toc-subsection {
+  padding-left: 48px
+}
+
 .preview-chapter h1 {
   font-size: 12pt;
   text-align: center;
@@ -1596,6 +1677,11 @@ code {
 .preview-subchapter h2 {
   font-size: 12pt;
   margin: 16px 0 8px
+}
+
+.preview-subsubchapter h3 {
+  font-size: 12pt;
+  margin: 12px 0 8px
 }
 
 .preview-page p {
@@ -1622,27 +1708,358 @@ code {
 .preview-page figcaption {
   margin-top: 6px;
   font-size: 10pt;
-  font-style: italic
+  font-style: italic;
+  text-align: center;
 }
 
+/* Flowchart Builder Styles */
+.flowchart-builder-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.flowchart-steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.flowchart-items-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.flowchart-step-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 10px 12px;
+  border-radius: 8px;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.flowchart-step-item.is-decision-item {
+  border-color: rgba(99, 102, 241, 0.4);
+  background: color-mix(in srgb, var(--surface) 92%, #6366f1);
+}
+
+.flowchart-main-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.flowchart-step-num {
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--primary);
+  width: 20px;
+  text-align: center;
+}
+
+.flowchart-shape-select {
+  width: 190px;
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 12px;
+}
+
+.flowchart-text-input {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 12px;
+}
+
+.flowchart-decision-branch-config {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  border: 1px dashed var(--line);
+}
+
+.branch-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 6px;
+}
+
+.badge-branch {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #4f46e5;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.branch-type-toggle {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 11.5px;
+}
+
+.branch-type-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  margin: 0;
+  font-weight: 500;
+}
+
+.branch-pair {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.branch-tag {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.tag-straight {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.tag-side {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.tag-no {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.side-node-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.side-node-inputs {
+  display: flex;
+  gap: 8px;
+}
+
+.side-node-rejoin-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.branch-target-select {
+  flex: 1;
+  padding: 4px 8px;
+  font-size: 11px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.preview-flowchart {
+  margin: 18px 0;
+  text-align: center;
+}
+
+.flowchart-svg {
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));
+}
+
+/* Format Tabel Terbuka Kaidah Ilmiah (3 Garis Horizontal) */
 .preview-page table {
   width: 100%;
-  table-layout: fixed;
+  table-layout: auto;
   border-collapse: collapse;
-  margin: 12px 0
+  margin: 8px 0 16px;
+  border-top: 1.5px solid #000;
+  border-bottom: 1.5px solid #000;
 }
 
 .preview-page th,
 .preview-page td {
-  border: 1px solid #777;
-  padding: 5px 7px;
-  text-align: left;
-  overflow-wrap: anywhere;
-  word-break: break-word
+  border: none;
+  padding: 6px 10px;
+  font-size: 10pt;
+  line-height: 1.25;
 }
 
 .preview-page th {
-  background: #eee
+  border-bottom: 1px solid #000;
+  background: transparent !important;
+  font-weight: 700;
+  text-align: center;
+}
+
+.preview-table-caption {
+  font-size: 10pt;
+  margin-bottom: 6px;
+  text-align: center;
+  text-indent: 0 !important;
+}
+
+.preview-header-num {
+  text-align: center;
+  font-size: 10pt;
+  margin-bottom: 24px;
+  color: #333;
+}
+
+.doc-subheading {
+  font-size: 12pt;
+  font-weight: bold;
+  text-align: center;
+  margin: 0 0 18px;
+}
+
+.doc-maintitle {
+  font-size: 12pt;
+  font-weight: bold;
+  text-align: center;
+  margin: 0 0 16px;
+}
+
+.doc-tagline {
+  text-align: center;
+  margin: 0 0 16px;
+  text-indent: 0 !important;
+}
+
+.doc-by {
+  text-align: center;
+  margin: 0 0 4px;
+  text-indent: 0 !important;
+}
+
+.approval-board-intro {
+  text-align: center;
+  line-height: 1.4;
+  margin: 12px 0;
+}
+
+.approval-board-intro p {
+  text-align: center;
+  text-indent: 0 !important;
+}
+
+.board-members {
+  margin: 16px 0 24px;
+}
+
+.board-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 11pt;
+}
+
+.board-officials {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 36px;
+  text-align: center;
+}
+
+.official-col p {
+  text-align: center;
+  text-indent: 0 !important;
+  margin-bottom: 50px;
+  font-size: 11pt;
+}
+
+.official-col strong {
+  display: block;
+  font-size: 11pt;
+}
+
+.official-col span {
+  font-size: 10pt;
+}
+
+.article-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.article-title {
+  font-size: 12pt;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.article-author-info {
+  text-align: center;
+  font-size: 11pt;
+  text-indent: 0 !important;
+}
+
+.abstract-box {
+  margin: 12px 0;
+}
+
+.abstract-box h3 {
+  font-size: 11pt;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.abstract-text {
+  font-size: 10pt;
+  line-height: 1.3;
+  text-align: justify;
+  text-indent: 0 !important;
+}
+
+.abstract-keywords {
+  font-size: 10pt;
+  margin-top: 4px;
+  text-indent: 0 !important;
+}
+
+.preview-references-list {
+  padding-left: 20px;
+  font-size: 11pt;
+  line-height: 1.4;
+}
+
+.preview-references-list li {
+  margin-bottom: 8px;
 }
 
 .preview-actions {

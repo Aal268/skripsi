@@ -2,15 +2,30 @@ const STORAGE_KEY = "thesisFlowData.v1";
 
 const DEFAULT_DATA = {
   identitas: {
-    judul: "Evaluasi Komparatif Large Language Models sebagai Reasoning Engine pada Agentic Conversational Sales Assistant: Analisis Kinerja Agen dan Purchase Funnel pada E-Commerce",
-    nama: "Muhammad Syahid Kusasih",
-    nim: "L200230272",
+    judul: "JUDUL NASKAH PUBLIKASI ILMIAH MAHASISWA",
+    nama: "NAMA LENGKAP MAHASISWA",
+    nim: "L200070150",
     programStudi: "PROGRAM STUDI TEKNIK INFORMATIKA",
     fakultas: "FAKULTAS KOMUNIKASI DAN INFORMATIKA",
     universitas: "UNIVERSITAS MUHAMMADIYAH SURAKARTA",
-    tahun: "2026",
-    pembimbing: "",
-    nidn: ""
+    tahun: "2023",
+    pembimbing: "Dr. Dosen Pembimbing, M.Sc.",
+    nidn: "123",
+    penguji1: "Dosen Penguji, S. Pd. M.Hum.",
+    penguji2: "Dr. Dosen Penguji, M. Ed.",
+    hariUjian: "Senin",
+    tanggalUjian: "20 Oktober 2023",
+    dekan: "Prof. Dr. Nama Dekan",
+    nidnDekan: "0601017001",
+    kaprodi: "Prof. Dr. Nama Kaprodi",
+    nidnKaprodi: "0602028001"
+  },
+  persantunan: "Penulis menyampaikan terima kasih yang sebesar-besarnya kepada Fakultas Komunikasi dan Informatika serta Program Studi Teknik Informatika Universitas Muhammadiyah Surakarta, dosen pembimbing, penguji, dan semua pihak yang telah membantu terlaksananya penelitian dan publikasi ilmiah ini.",
+  abstrak: {
+    indonesia: "Gaya selingkung (style sheet) adalah tata tulis yang dibakukan oleh editor sebuah jurnal ilmiah tulisan agar tulisan-tulisan yang dimuat memiliki kesamaan gaya (style). Selanjutnya, template adalah sumber baku penulisan ilmiah yang biasanya sudah disediakan dalam bentuk file untuk memudahkan penulis memenuhi persyaratan gaya selingkung yang telah ditetapkan. File ini dibuat untuk memudahkan mahasiswa S1 UMS menulis naskah publikasi ilmiah sebagai salah satu syarat kelulusan. Abstrak ditulis dengan paragraf tunggal dan memuat uraian singkat mengenai masalah dan tujuan penelitian, metode yang digunakan, dan hasil. Panjang abstrak yang baik adalah 150 sampai dengan 300 kata menggunakan font Times New Roman ukuran 10.",
+    kataKunci: "artikel, gaya selingkung, penulisan ilmiah, template",
+    english: "Style sheet is a manual detailing the house style of a particular publisher or publication. Template is a computer document that has the basic format of written text and that can be used many different times. An abstract is a brief summary of a research article, thesis, review, conference proceeding or any-depth analysis of a particular subject or discipline, and is often used to help the reader quickly ascertain the paper purposes. Abstract length varies by discipline and publisher requirements.",
+    keywords: "article, scientific publication, style sheet, template"
   },
   bab1: {
     latarBelakang: `Pemanfaatan kecerdasan buatan dalam sistem perdagangan elektronik terus berkembang dari fungsi yang sebelumnya terbatas pada penyediaan informasi menjadi sistem yang mampu berinteraksi secara aktif dengan pengguna. Dalam proses pembelian, pelanggan tidak selalu hanya membutuhkan daftar produk, tetapi juga membutuhkan bantuan untuk menjelaskan kebutuhan, mempertimbangkan berbagai pilihan, menyesuaikan produk dengan kriteria tertentu, serta menentukan produk yang paling sesuai.
@@ -155,9 +170,14 @@ function migrateLegacyChapters(data) {
 }
 
 function normalizeData(data) {
+  const abstractData = data.abstrak && typeof data.abstrak === "object" && !Array.isArray(data.abstrak)
+    ? data.abstrak
+    : {};
   const normalized = {
     ...data,
-    identitas: data.identitas || {},
+    identitas: { ...DEFAULT_DATA.identitas, ...(data.identitas || {}) },
+    persantunan: data.persantunan !== undefined ? data.persantunan : DEFAULT_DATA.persantunan,
+    abstrak: { ...DEFAULT_DATA.abstrak, ...abstractData },
     referensi: Array.isArray(data.referensi) ? data.referensi : [],
     sources: Array.isArray(data.sources) ? data.sources : [],
     citationStyle: data.citationStyle === "ieee" ? "ieee" : "apa"
@@ -181,12 +201,25 @@ function normalizeData(data) {
   }
   normalized.chapters = normalized.chapters.map(chapter => ({
     title: chapter.title || "",
-    sections: (Array.isArray(chapter.sections) ? chapter.sections : []).map(section => ({
-      title: section.title || "",
-      blocks: Array.isArray(section.blocks) ? section.blocks : []
-    }))
+    sections: (Array.isArray(chapter.sections) ? chapter.sections : []).map(section => normalizeSection(section))
   }));
   return normalized;
+}
+
+function normalizeSection(section) {
+  return {
+    title: section.title || "",
+    blocks: Array.isArray(section.blocks) ? section.blocks : [],
+    subsections: (Array.isArray(section.subsections) ? section.subsections : []).map(subsection => ({
+      title: subsection.title || "",
+      blocks: Array.isArray(subsection.blocks) ? subsection.blocks : []
+    }))
+  };
+}
+
+function getEditableSection(chapter, sectionIndex, subsectionIndex) {
+  const section = chapter?.sections?.[sectionIndex];
+  return subsectionIndex === undefined ? section : section?.subsections?.[subsectionIndex];
 }
 
 function loadData() {
@@ -424,9 +457,354 @@ function bindObjectCard(card, item, onDelete) {
   card.querySelector(".icon-btn").addEventListener("click", onDelete);
 }
 
-function renderContentBlock(block, chapterIndex, sectionIndex, blockIndex) {
-  const blockData = `data-chapter-index="${chapterIndex}" data-section-index="${sectionIndex}" data-block-index="${blockIndex}"`;
-  const labels = { paragraph: "Paragraf", list: "Daftar", image: "Gambar", table: "Tabel", chart: "Grafik" };
+let mermaidInitialized = false;
+function ensureMermaid() {
+  if (typeof mermaid !== "undefined" && !mermaidInitialized) {
+    try {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: "neutral",
+        flowchart: {
+          curve: "basis",
+          htmlLabels: true
+        },
+        securityLevel: "loose"
+      });
+      mermaidInitialized = true;
+    } catch (e) {
+      console.warn("Mermaid init error:", e);
+    }
+  }
+}
+
+function serializeFlowchartMarkdown(steps) {
+  if (!Array.isArray(steps) || steps.length === 0) {
+    return `graph TD
+    A([Mulai]) --> B[/Input Data / Nilai/]
+    B --> C{Sisa Bagi = 0?}
+    C -- Ya --> D[/Genap/]
+    C -- Tidak --> E[/Ganjil/]
+    D --> F([Selesai])
+    E --> F`;
+  }
+  let out = "graph TD\n";
+  const idMap = steps.map((_, i) => String.fromCharCode(65 + (i % 26)) + (i >= 26 ? Math.floor(i / 26) : ""));
+
+  steps.forEach((s, i) => {
+    const id = idMap[i];
+    const text = (s.text || `Langkah ${i + 1}`).replace(/["[\]{}()]/g, "");
+    let shapeStr = `[${text}]`;
+    if (s.shape === "terminator") shapeStr = `([${text}])`;
+    else if (s.shape === "decision") shapeStr = `{${text}}`;
+    else if (s.shape === "io") shapeStr = `[/${text}/]`;
+
+    out += `    ${id}${shapeStr}\n`;
+  });
+
+  steps.forEach((s, i) => {
+    const id = idMap[i];
+    if (i < steps.length - 1) {
+      const nextId = idMap[i + 1];
+      if (s.shape === "decision") {
+        const sideSteps = s.sideSteps || (s.sideNodeText ? [{ shape: s.sideNodeShape || "process", text: s.sideNodeText }] : []);
+        const branchAssign = s.branchAssign || "sideYes_straightNo";
+        const straightLbl = branchAssign === "sideYes_straightNo" ? "No" : "Yes";
+        const sideLbl = branchAssign === "sideYes_straightNo" ? "Yes" : "No";
+
+        out += `    ${id} -- ${straightLbl} --> ${nextId}\n`;
+
+        if (sideSteps.length > 0) {
+          let prevSideId = id;
+          sideSteps.forEach((st, si) => {
+            const sideId = `S${i + 1}_${si + 1}`;
+            const stText = (st.text || `Side ${si + 1}`).replace(/["[\]{}()]/g, "");
+            let stShape = `[${stText}]`;
+            if (st.shape === "terminator") stShape = `([${stText}])`;
+            else if (st.shape === "decision") stShape = `{${stText}}`;
+            else if (st.shape === "io") stShape = `[/${stText}/]`;
+
+            out += `    ${sideId}${stShape}\n`;
+            if (si === 0) {
+              out += `    ${id} -- ${sideLbl} --> ${sideId}\n`;
+            } else {
+              out += `    ${prevSideId} --> ${sideId}\n`;
+            }
+            prevSideId = sideId;
+          });
+
+          const rj = s.sideRejoinTarget !== undefined && s.sideRejoinTarget !== null && s.sideRejoinTarget !== "" ? Number(s.sideRejoinTarget) : (i + 2);
+          if (rj < steps.length) {
+            out += `    ${prevSideId} --> ${idMap[rj]}\n`;
+          }
+        } else if (s.branchNoTarget !== undefined && s.branchNoTarget !== null && s.branchNoTarget !== "") {
+          const tIdx = Number(s.branchNoTarget);
+          if (tIdx < steps.length) {
+            out += `    ${id} -- ${sideLbl} --> ${idMap[tIdx]}\n`;
+          }
+        }
+      } else {
+        out += `    ${id} --> ${nextId}\n`;
+      }
+    }
+  });
+  return out.trim();
+}
+
+function isGraphvizDot(text) {
+  if (!text) return false;
+  const t = text.trim();
+  return /^\s*(strict\s+)?(di)?graph\b/i.test(t) || (/\{[\s\S]*\}[\s\S]*$/m.test(t) && t.includes("->"));
+}
+
+function parseFlowchartMarkdown(text) {
+  if (!text || !text.trim()) return [];
+  const raw = text.trim();
+
+  // If text is Graphviz DOT syntax, extract labels and shapes for fallback steps if needed
+  if (isGraphvizDot(raw)) {
+    const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    const nodeMap = new Map();
+    const order = [];
+
+    const ensureNode = (id, text = "", shape = "process") => {
+      id = id.trim();
+      if (!id || /^(graph|node|edge|rank|strict|digraph)$/i.test(id)) return null;
+      if (!nodeMap.has(id)) {
+        nodeMap.set(id, { id, text: text || id, shape, targets: [] });
+        order.push(id);
+      } else {
+        const n = nodeMap.get(id);
+        if (text && (!n.text || n.text === id)) n.text = text;
+        if (shape && shape !== "process") n.shape = shape;
+      }
+      return nodeMap.get(id);
+    };
+
+    lines.forEach(line => {
+      if (/^\s*(strict\s+)?(di)?graph\b/i.test(line) || /^\s*(graph|node|edge)\s*\[/i.test(line) || /^\s*[{}]/.test(line)) return;
+
+      // Extract node declarations: A [label="...", shape=diamond, ...]
+      const nodeDecl = line.match(/^([a-zA-Z0-9_-]+)\s*\[(.*?)\]/);
+      if (nodeDecl) {
+        const id = nodeDecl[1];
+        const attrs = nodeDecl[2];
+        const mLabel = attrs.match(/label\s*=\s*"([^"]*)"/i);
+        const mShape = attrs.match(/shape\s*=\s*([a-zA-Z0-9_-]+)/i);
+        let text = mLabel ? mLabel[1].replace(/\\n/g, " ") : id;
+        let shape = "process";
+        if (mShape) {
+          const s = mShape[1].toLowerCase();
+          if (s === "diamond") shape = "decision";
+          else if (s === "oval" || s === "ellipse" || s === "circle") shape = "terminator";
+          else if (s === "parallelogram") shape = "io";
+        }
+        ensureNode(id, text, shape);
+      }
+
+      // Extract node chain: A -> B -> C -> D
+      if (line.includes("->")) {
+        const cleanLine = line.replace(/\[.*?\]/g, ""); // strip attributes
+        const parts = cleanLine.split("->").map(p => p.trim().replace(/;$/, "")).filter(Boolean);
+        for (let i = 0; i < parts.length; i++) {
+          const nodeId = parts[i];
+          if (/^[a-zA-Z0-9_-]+$/.test(nodeId)) {
+            ensureNode(nodeId, nodeId, "process");
+          }
+        }
+      }
+    });
+
+    if (order.length > 0) {
+      return order.map((id, idx) => {
+        const n = nodeMap.get(id);
+        return {
+          id: `s_${idx + 1}`,
+          shape: n?.shape || "process",
+          text: n?.text || id
+        };
+      });
+    }
+  }
+
+  // If text is Mermaid syntax, parse nodes and connections into steps
+  if (/^\s*(graph|flowchart)\s+(TD|TB|LR|RL)/i.test(raw) || raw.includes("-->")) {
+    const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    const nodeMap = new Map(); // id -> { id, text, shape, targets: [] }
+    const order = [];
+
+    const ensureNode = (id, text = "", shape = "process") => {
+      id = id.trim();
+      if (!nodeMap.has(id)) {
+        nodeMap.set(id, { id, text: text || id, shape, targets: [] });
+        order.push(id);
+      } else {
+        const n = nodeMap.get(id);
+        if (text && (!n.text || n.text === id)) n.text = text;
+        if (shape && shape !== "process") n.shape = shape;
+      }
+      return nodeMap.get(id);
+    };
+
+    const extractNode = token => {
+      token = token.trim();
+      // Test shapes:
+      // A([text]) -> terminator
+      let m = token.match(/^([a-zA-Z0-9_-]+)\s*\(\[(.*?)\]\)/);
+      if (m) return ensureNode(m[1], m[2], "terminator");
+      // A{text} -> decision
+      m = token.match(/^([a-zA-Z0-9_-]+)\s*\{(.*?)\}/);
+      if (m) return ensureNode(m[1], m[2], "decision");
+      // A[/text/] or A[\text\] -> io
+      m = token.match(/^([a-zA-Z0-9_-]+)\s*\[\/(.*?)\/\]/) || token.match(/^([a-zA-Z0-9_-]+)\s*\[\\(.*?)\\\]/);
+      if (m) return ensureNode(m[1], m[2], "io");
+      // A((text)) -> circle / terminator
+      m = token.match(/^([a-zA-Z0-9_-]+)\s*\(\((.*?)\)\)/);
+      if (m) return ensureNode(m[1], m[2], "terminator");
+      // A[text] -> process
+      m = token.match(/^([a-zA-Z0-9_-]+)\s*\[(.*?)\]/);
+      if (m) return ensureNode(m[1], m[2], "process");
+      // Just ID: A
+      m = token.match(/^([a-zA-Z0-9_-]+)$/);
+      if (m) return ensureNode(m[1], m[1], "process");
+      return null;
+    };
+
+    lines.forEach(line => {
+      if (/^\s*(graph|flowchart)\s+/i.test(line)) return;
+
+      // Check arrows like A --> B or A -- Yes --> B or A -->|Yes| B
+      if (line.includes("-->") || line.includes("---")) {
+        const parts = line.split(/-->|---|->/);
+        for (let i = 0; i < parts.length - 1; i++) {
+          let leftPart = parts[i].trim();
+          let rightPart = parts[i + 1].trim();
+
+          let label = "";
+          // Check label in leftPart: A -- label
+          const mLabel = leftPart.match(/^(.*?)\s*--\s*(.*?)$/);
+          if (mLabel) {
+            leftPart = mLabel[1].trim();
+            label = mLabel[2].trim();
+          }
+          // Check label in rightPart: |label| B
+          const mPipe = rightPart.match(/^\|(.*?)\|\s*(.*)$/);
+          if (mPipe) {
+            label = mPipe[1].trim();
+            rightPart = mPipe[2].trim();
+          }
+
+          const srcNode = extractNode(leftPart);
+          const tgtNode = extractNode(rightPart);
+          if (srcNode && tgtNode) {
+            srcNode.targets.push({ targetId: tgtNode.id, label });
+          }
+        }
+      } else {
+        extractNode(line);
+      }
+    });
+
+    return order.map((id, idx) => {
+      const n = nodeMap.get(id);
+      return {
+        id: `s_${idx + 1}`,
+        shape: n.shape || "process",
+        text: n.text || id
+      };
+    });
+  }
+
+  // Fallback: sequential lines format "1. Mulai (oval)"
+  const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const steps = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    let clean = lines[i];
+    if (clean.startsWith("- ")) clean = clean.slice(2).trim();
+    else if (/^\d+[\.\)]\s*/.test(clean)) clean = clean.replace(/^\d+[\.\)]\s*/, "").trim();
+
+    let shape = "process";
+    let mainPart = clean;
+    let branchInfo = "";
+
+    if (clean.includes("->")) {
+      const parts = clean.split("->");
+      mainPart = parts[0].trim();
+      branchInfo = parts.slice(1).join("->").trim();
+    }
+
+    const lowerMain = mainPart.toLowerCase();
+    if (lowerMain.includes("(terminator)") || lowerMain.includes("(oval)") || lowerMain.includes("(mulai)") || lowerMain.includes("(selesai)")) {
+      shape = "terminator";
+    } else if (lowerMain.includes("(decision)") || lowerMain.includes("(diamond)") || lowerMain.includes("(keputusan)") || lowerMain.includes("?")) {
+      shape = "decision";
+    } else if (lowerMain.includes("(io)") || lowerMain.includes("(input)") || lowerMain.includes("(output)")) {
+      shape = "io";
+    }
+
+    let cleanedText = mainPart;
+    for (const tag of ["(terminator)", "(oval)", "(mulai)", "(selesai)", "(decision)", "(diamond)", "(keputusan)", "(io)", "(input)", "(output)", "(process)", "(rect)"]) {
+      const idx = cleanedText.toLowerCase().indexOf(tag);
+      if (idx !== -1) cleanedText = cleanedText.slice(0, idx) + cleanedText.slice(idx + tag.length);
+    }
+    cleanedText = cleanedText.trim();
+    if (!cleanedText) cleanedText = `Langkah ${i + 1}`;
+
+    const step = {
+      id: `s_${i + 1}`,
+      shape: shape,
+      text: cleanedText
+    };
+
+    if (shape === "decision" && branchInfo) {
+      step.branchType = "node";
+      step.branchAssign = "sideYes_straightNo";
+      const sideSteps = [];
+
+      const subParts = branchInfo.split("|").map(p => p.trim());
+      for (const sp of subParts) {
+        const spLower = sp.toLowerCase();
+        if (spLower.startsWith("rejoin:") || spLower.startsWith("rejoin")) {
+          const rjVal = parseInt(sp.replace(/[^0-9]/g, ""), 10);
+          if (!isNaN(rjVal) && rjVal > 0) step.sideRejoinTarget = rjVal - 1;
+        } else if (spLower.startsWith("loop:") || spLower.startsWith("kembali:") || spLower.startsWith("loop") || spLower.startsWith("kembali")) {
+          step.branchType = "jump";
+          const lpVal = parseInt(sp.replace(/[^0-9]/g, ""), 10);
+          if (!isNaN(lpVal) && lpVal > 0) step.branchNoTarget = lpVal - 1;
+        } else if (spLower.includes("sideno") || spLower.includes("tidaksamping")) {
+          step.branchAssign = "sideNo_straightYes";
+        } else {
+          let sideContent = sp.includes(":") ? sp.split(":")[1].trim() : sp;
+          let sShape = "process";
+          const sLower = sideContent.toLowerCase();
+          if (sLower.includes("(io)")) sShape = "io";
+          else if (sLower.includes("(terminator)")) sShape = "terminator";
+          else if (sLower.includes("(decision)")) sShape = "decision";
+
+          for (const tag of ["(io)", "(process)", "(rect)", "(terminator)", "(decision)"]) {
+            const idx = sideContent.toLowerCase().indexOf(tag);
+            if (idx !== -1) sideContent = sideContent.slice(0, idx) + sideContent.slice(idx + tag.length);
+          }
+          sideContent = sideContent.trim();
+          if (sideContent) sideSteps.push({ shape: sShape, text: sideContent });
+        }
+      }
+
+      if (sideSteps.length > 0) {
+        step.sideSteps = sideSteps;
+        step.sideNodeText = sideSteps[0].text;
+        step.sideNodeShape = sideSteps[0].shape;
+      }
+    }
+    steps.push(step);
+  }
+  return steps;
+}
+
+function renderContentBlock(block, chapterIndex, sectionIndex, blockIndex, subsectionIndex) {
+  const subsectionData = subsectionIndex === undefined ? "" : ` data-subsection-index="${subsectionIndex}"`;
+  const blockData = `data-chapter-index="${chapterIndex}" data-section-index="${sectionIndex}"${subsectionData} data-block-index="${blockIndex}"`;
+  const labels = { paragraph: "Paragraf", list: "Daftar", image: "Gambar", table: "Tabel", chart: "Grafik", flowchart: "Diagram Alir (Flowchart)" };
   let content = "";
   if (block.type === "paragraph") {
     const sourceOptions = state.sources.map(source =>
@@ -438,7 +816,12 @@ function renderContentBlock(block, chapterIndex, sectionIndex, blockIndex) {
     content = `<div class="object-grid"><label class="full">Jenis daftar<select data-editor-field="listStyle" ${blockData}><option value="numbered" ${block.ordered !== false ? "selected" : ""}>Bernomor</option><option value="bullet" ${block.ordered === false ? "selected" : ""}>Poin</option></select></label><label class="full">Isi daftar<textarea rows="5" data-editor-field="listItems" ${blockData} placeholder="Satu item per baris">${escapeHtml((block.items || []).join("\n"))}</textarea></label></div>`;
   } else if (block.type === "image") {
     const preview = block.dataUrl ? `<img src="${escapeAttr(block.dataUrl)}" alt="Pratinjau gambar">` : "";
-    content = `<label class="image-picker">Pilih gambar<input type="file" accept="image/*" data-image-input ${blockData}></label><div class="image-preview">${preview}</div><label>Keterangan gambar<textarea rows="2" data-editor-field="caption" ${blockData} placeholder="Opsional">${escapeHtml(block.caption || "")}</textarea></label>`;
+    content = `<label class="image-picker">Pilih gambar<input type="file" accept="image/*" data-image-input ${blockData}></label>
+      <div class="image-preview">${preview}</div>
+      <div class="chart-fields" style="margin-top:8px;">
+        <label>Keterangan gambar<input data-editor-field="caption" ${blockData} value="${escapeAttr(block.caption || "")}" placeholder="Contoh: Gambar 1. Arsitektur Sistem"></label>
+        <label>Lebar di Word (cm)<input type="number" step="0.5" min="4" max="14" data-editor-field="widthCm" ${blockData} value="${escapeAttr(block.widthCm || "11.5")}" placeholder="Default: 11.5"></label>
+      </div>`;
   } else if (block.type === "table") {
     const inputMode = block.tableInputMode || "grid";
     content = `<div class="data-input-tools"><label>Cara input<select data-editor-field="tableInputMode" ${blockData}><option value="grid" ${inputMode === "grid" ? "selected" : ""}>Kolom dan baris</option><option value="text" ${inputMode === "text" ? "selected" : ""}>Teks dengan |</option></select></label></div>
@@ -461,6 +844,57 @@ function renderContentBlock(block, chapterIndex, sectionIndex, blockIndex) {
       <label class="full">Keterangan gambar<input data-editor-field="caption" ${blockData} value="${escapeAttr(block.caption || "")}" placeholder="Opsional"></label>
       <div class="chart-editor-preview full" data-chart-preview>${chartPreviewSVG(block)}</div>
     </div>`;
+  } else if (block.type === "flowchart") {
+    if (!block.flowchartText) {
+      block.flowchartText = serializeFlowchartMarkdown(block.flowchartSteps || []);
+    }
+    // Pastikan flowchartSteps sinkron dengan flowchartText
+    block.flowchartSteps = parseFlowchartMarkdown(block.flowchartText);
+
+    content = `<div class="flowchart-markdown-container">
+      <div class="chart-fields">
+        <label>Judul Diagram Alir<input data-editor-field="flowchartTitle" ${blockData} value="${escapeAttr(block.flowchartTitle || "Diagram Alir Penelitian")}" placeholder="Contoh: Diagram Alir Penelitian"></label>
+        <label>Label Gambar (Caption)<input data-editor-field="caption" ${blockData} value="${escapeAttr(block.caption || "Gambar 1. Diagram Alir Penelitian")}" placeholder="Contoh: Gambar 1. Diagram Alir Penelitian"></label>
+      </div>
+
+      <!-- TEXT / GRAPHVIZ DOT EDITOR FOR FLOWCHART -->
+      <div style="margin-top:12px;background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:10px;padding:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+          <div>
+            <strong style="color:var(--primary);font-size:13px;display:flex;align-items:center;gap:6px;">
+              <span>⚡ Editor Diagram Alir Graphviz (DOT Language)</span>
+            </strong>
+            <small style="color:var(--muted);font-size:11.5px;">Gunakan sintaks Graphviz DOT (<code>digraph { ... }</code>, <code>splines=ortho</code>, <code>A -&gt; B</code>, dsb). Mendukung warna, bentuk siku-siku, diamond, &amp; rank.</small>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="mini-btn" type="button" data-action="flowchart-insert-template" data-template="dot-step" ${blockData}>+ Tambah Edge (A -&gt; B)</button>
+            <button class="mini-btn" type="button" data-action="flowchart-insert-template" data-template="dot-decision" ${blockData}>+ Decision Diamond</button>
+            <button class="mini-btn" type="button" data-action="flowchart-insert-template" data-template="dot-example" ${blockData}>📋 Contoh RecruitmentProcess</button>
+          </div>
+        </div>
+
+        <textarea rows="14" data-editor-field="flowchartText" ${blockData} style="width:100%;font-family:Consolas, 'Courier New', monospace;font-size:12.5px;line-height:1.5;padding:10px 12px;border:1.5px solid #94a3b8;border-radius:6px;background:#ffffff;box-sizing:border-box;" placeholder="digraph G {&#10;    graph [splines=ortho];&#10;    A -&gt; B;&#10;}">${escapeHtml(block.flowchartText || "")}</textarea>
+
+        <div style="margin-top:6px;padding:8px 12px;background:#eef2ff;border-radius:6px;font-size:11.5px;color:#3730a3;line-height:1.5;">
+          <strong>💡 Tips Format Graphviz (DOT Language):</strong><br>
+          • <strong>A [shape=box, style=filled, fillcolor="#cce5ff"]</strong> = Kotak proses dengan warna kustom<br>
+          • <strong>E [shape=diamond, fillcolor="#ffebcc"]</strong> = Belah ketupat keputusan (decision)<br>
+          • <strong>A -&gt; B -&gt; C</strong> = Sambungan berantai | <strong>E -&gt; F [label=" No "]</strong> = Cabang dengan label No/Yes<br>
+          • <strong>graph [splines=ortho]</strong> = Garis koneksi rapi siku-siku | <strong>{ rank=same; A G }</strong> = Menjajarkan posisi horizontal
+        </div>
+      </div>
+
+      <!-- LIVE CANVAS PREVIEW -->
+      <div class="flowchart-canvas-section" style="margin-top:14px;background:#ffffff;padding:16px;border-radius:12px;border:1.5px solid var(--line);box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <strong style="font-size:13px;color:var(--text);display:flex;align-items:center;gap:6px;">
+            <span>👁️ Pratinjau Kanvas Diagram Alir</span>
+          </strong>
+          <span style="font-size:11px;background:#dcfce7;color:#166534;padding:2px 8px;border-radius:10px;font-weight:600;">Live Preview Otomatis</span>
+        </div>
+        <div data-flowchart-preview>${flowchartPreviewSVG(block)}</div>
+      </div>
+    </div>`;
   }
   return `<article class="content-block"><div class="block-heading"><strong>${labels[block.type] || "Konten"}</strong><button class="icon-btn" type="button" title="Hapus blok" data-action="delete-block" ${blockData}>×</button></div>${content}</article>`;
 }
@@ -473,10 +907,18 @@ function renderChapters() {
       <label>Judul Bab<input class="chapter-title" data-editor-field="chapterTitle" data-chapter-index="${chapterIndex}" value="${escapeAttr(chapter.title)}" placeholder="Contoh: Pendahuluan"></label>
       ${(chapter.sections || []).map((section, sectionIndex) => `
         <section class="subchapter-card" id="chapter-${chapterIndex + 1}-section-${sectionIndex + 1}" data-chapter-index="${chapterIndex}" data-section-index="${sectionIndex}">
-          <div class="subchapter-heading"><span>${chapterIndex + 1}.${sectionIndex + 1}</span><button class="icon-btn" type="button" title="Hapus subbab" data-action="delete-section">×</button></div>
+          <div class="subchapter-heading"><span>${chapterIndex + 1}.${sectionIndex + 1}</span><button class="icon-btn" type="button" title="Hapus subbab" data-action="delete-section" data-chapter-index="${chapterIndex}" data-section-index="${sectionIndex}">×</button></div>
           <label>Judul Subbab<input data-editor-field="sectionTitle" data-chapter-index="${chapterIndex}" data-section-index="${sectionIndex}" value="${escapeAttr(section.title)}" placeholder="Contoh: Latar Belakang"></label>
           <div class="content-blocks">${(section.blocks || []).map((block, blockIndex) => renderContentBlock(block, chapterIndex, sectionIndex, blockIndex)).join("")}</div>
-          <div class="block-adder"><select aria-label="Jenis konten"><option value="paragraph">Paragraf</option><option value="list">Daftar</option><option value="image">Gambar</option><option value="table">Tabel</option><option value="chart">Grafik</option></select><button class="mini-btn" type="button" data-action="add-block">+ Tambah Konten</button></div>
+          <div class="block-adder"><select aria-label="Jenis konten"><option value="paragraph">Paragraf</option><option value="list">Daftar</option><option value="image">Gambar</option><option value="table">Tabel</option><option value="chart">Grafik</option><option value="flowchart">Diagram Alir (Flowchart)</option></select><button class="mini-btn" type="button" data-action="add-block" data-chapter-index="${chapterIndex}" data-section-index="${sectionIndex}">+ Tambah Konten</button></div>
+          ${(section.subsections || []).map((subsection, subsectionIndex) => `
+            <section class="subchapter-card nested-subchapter-card" id="chapter-${chapterIndex + 1}-section-${sectionIndex + 1}-subsection-${subsectionIndex + 1}" data-chapter-index="${chapterIndex}" data-section-index="${sectionIndex}" data-subsection-index="${subsectionIndex}">
+              <div class="subchapter-heading"><span>${chapterIndex + 1}.${sectionIndex + 1}.${subsectionIndex + 1}</span><button class="icon-btn" type="button" title="Hapus sub-subbab" data-action="delete-subsection" data-chapter-index="${chapterIndex}" data-section-index="${sectionIndex}" data-subsection-index="${subsectionIndex}">×</button></div>
+              <label>Judul Sub-subbab<input data-editor-field="subsectionTitle" data-chapter-index="${chapterIndex}" data-section-index="${sectionIndex}" data-subsection-index="${subsectionIndex}" value="${escapeAttr(subsection.title)}" placeholder="Contoh: Pengertian Konsep"></label>
+              <div class="content-blocks">${(subsection.blocks || []).map((block, blockIndex) => renderContentBlock(block, chapterIndex, sectionIndex, blockIndex, subsectionIndex)).join("")}</div>
+              <div class="block-adder"><select aria-label="Jenis konten"><option value="paragraph">Paragraf</option><option value="list">Daftar</option><option value="image">Gambar</option><option value="table">Tabel</option><option value="chart">Grafik</option><option value="flowchart">Diagram Alir (Flowchart)</option></select><button class="mini-btn" type="button" data-action="add-block" data-chapter-index="${chapterIndex}" data-section-index="${sectionIndex}" data-subsection-index="${subsectionIndex}">+ Tambah Konten</button></div>
+            </section>`).join("")}
+          <button class="mini-btn add-subchapter" type="button" data-action="add-subsection" data-chapter-index="${chapterIndex}" data-section-index="${sectionIndex}">+ Tambah Sub-subbab</button>
         </section>`).join("")}
       <button class="mini-btn add-subchapter" type="button" data-action="add-section" data-chapter-index="${chapterIndex}">+ Tambah Subbab</button>
     </article>`).join("");
@@ -489,21 +931,36 @@ function renderChapters() {
 function renderChapterNav() {
   const host = document.getElementById("chapterNav");
   if (chapterObserver) chapterObserver.disconnect();
-  const sectionCount = state.chapters.reduce((total, chapter) => total + (chapter.sections || []).length, 0);
-  document.getElementById("chapterCount").textContent = `${state.chapters.length} bab, ${sectionCount} subbab`;
+  const counts = state.chapters.reduce((total, chapter) => {
+    for (const section of chapter.sections || []) {
+      total.sections += 1;
+      total.subsections += (section.subsections || []).length;
+    }
+    return total;
+  }, { sections: 0, subsections: 0 });
+  document.getElementById("chapterCount").textContent = `${state.chapters.length} bab, ${counts.sections} subbab, ${counts.subsections} sub-subbab`;
   const query = document.getElementById("chapterSearch").value.trim().toLocaleLowerCase();
   const groups = state.chapters.map((chapter, chapterIndex) => {
     const chapterTitle = chapter.title || `Bab ${chapterIndex + 1}`;
     const matchesChapter = chapterTitle.toLocaleLowerCase().includes(query);
-    const matchingSections = (chapter.sections || []).map((section, sectionIndex) => ({ section, sectionIndex }))
-      .filter(({ section }) => !query || matchesChapter || (section.title || "").toLocaleLowerCase().includes(query));
+    const matchingSections = (chapter.sections || []).map((section, sectionIndex) => ({
+      section, sectionIndex,
+      subsections: (section.subsections || []).map((subsection, subsectionIndex) => ({ subsection, subsectionIndex }))
+    })).filter(({ section, subsections }) => !query || matchesChapter ||
+      (section.title || "").toLocaleLowerCase().includes(query) ||
+      subsections.some(({ subsection }) => (subsection.title || "").toLocaleLowerCase().includes(query)));
     if (query && !matchesChapter && matchingSections.length === 0) return "";
     const chapterId = `chapter-${chapterIndex + 1}`;
-    const sectionLinks = matchingSections.map(({ section, sectionIndex }) => `
+    const sectionLinks = matchingSections.map(({ section, sectionIndex, subsections }) => `
       <button class="chapter-nav-link chapter-subnav-link" type="button" data-scroll-target="${chapterId}-section-${sectionIndex + 1}" title="${escapeAttr(section.title || `Subbab ${sectionIndex + 1}`)}">
         <span class="chapter-nav-number">${chapterIndex + 1}.${sectionIndex + 1}</span>
         <span>${escapeHtml(section.title || `Subbab ${sectionIndex + 1}`)}</span>
-      </button>`).join("");
+      </button>
+      ${subsections.map(({ subsection, subsectionIndex }) => `
+        <button class="chapter-nav-link chapter-subnav-link chapter-subsubnav-link" type="button" data-scroll-target="${chapterId}-section-${sectionIndex + 1}-subsection-${subsectionIndex + 1}" title="${escapeAttr(subsection.title || `Sub-subbab ${subsectionIndex + 1}`)}">
+          <span class="chapter-nav-number">${chapterIndex + 1}.${sectionIndex + 1}.${subsectionIndex + 1}</span>
+          <span>${escapeHtml(subsection.title || `Sub-subbab ${subsectionIndex + 1}`)}</span>
+        </button>`).join("")}`).join("");
     return `<div class="chapter-nav-group">
       <button class="chapter-nav-link chapter-nav-title" type="button" data-scroll-target="${chapterId}" title="${escapeAttr(chapterTitle)}">
         <span class="chapter-nav-number">BAB ${chapterIndex + 1}</span>
@@ -524,7 +981,12 @@ function renderChapterNav() {
   state.chapters.forEach((chapter, chapterIndex) => {
     const sections = chapter.sections || [];
     if (sections.length) {
-      sections.forEach((_, sectionIndex) => chapterObserver.observe(document.getElementById(`chapter-${chapterIndex + 1}-section-${sectionIndex + 1}`)));
+      sections.forEach((section, sectionIndex) => {
+        chapterObserver.observe(document.getElementById(`chapter-${chapterIndex + 1}-section-${sectionIndex + 1}`));
+        (section.subsections || []).forEach((_, subsectionIndex) => chapterObserver.observe(
+          document.getElementById(`chapter-${chapterIndex + 1}-section-${sectionIndex + 1}-subsection-${subsectionIndex + 1}`)
+        ));
+      });
     } else {
       chapterObserver.observe(document.getElementById(`chapter-${chapterIndex + 1}`));
     }
@@ -546,6 +1008,83 @@ function newContentBlock(type) {
   if (type === "image") return { type, dataUrl: "", caption: "" };
   if (type === "table") return { type, tableText: "Kolom 1 | Kolom 2\nIsi 1 | Isi 2" };
   if (type === "chart") return { type, chartType: "bar", chartTitle: "", chartData: "Kategori A | 10\nKategori B | 15", caption: "" };
+  if (type === "flowchart") {
+    const defaultText = `digraph RecruitmentProcess {
+    // Pengaturan bentuk garis menjadi siku-siku (ortogonal)
+    graph [splines=ortho, nodesep=0.6, ranksep=0.6, fontname="Arial"];
+    node [shape=box, style=filled, fillcolor="#cce5ff", fontname="Arial", fontsize=11, width=1.5];
+    edge [fontname="Arial", fontsize=10];
+
+    // Kolom 1
+    A [label="Identify\\nstaffing need", shape=box, style="rounded,filled", fillcolor="#ffcccc"];
+    B [label="Define and\\nwrite up job\\ndescription"];
+    C [label="Send personnel\\nrequest from\\nto HR"];
+    D [label="Determine\\nclassification"];
+    E [label="Regular\\nhire?", shape=diamond, fillcolor="#ffebcc"];
+    F [label="Temp hiring\\nprocess", shape=box, style="rounded,filled"];
+
+    A -> B -> C -> D -> E;
+    E -> F [label=" No "];
+
+    // Kolom 2
+    G [label="Post Job\\nInternally"];
+    H [label="Suitable\\ncandidate?", shape=diamond, fillcolor="#ffebcc"];
+    I [label="Examine\\nexisting\\nresumes on file"];
+    J [label="Suitable\\ncandidate?", shape=diamond, fillcolor="#ffebcc"];
+    K [label="Develop\\nrecruitment\\nstrategy"];
+    L [label="Place ads"];
+    N [label="Gather\\nresumes"];
+    O [label="Resume\\nqualified?", shape=diamond, fillcolor="#ffebcc"];
+
+    E -> G [label=" Yes "];
+    G -> H;
+    H -> I [label=" No "];
+    I -> J;
+    J -> K [label=" No "];
+    K -> L -> N -> O;
+
+    // Kolom 3
+    M [label="Arrange\\nmeeting with\\ncandidate"];
+    Q [label="Conduct\\npreliminary\\ninterview"];
+    R [label="Develop\\ninterview\\nquestions"];
+    S [label="Conduct\\ninterview"];
+    T [label="References\\nOK?", shape=diamond, fillcolor="#ffebcc"];
+
+    H -> M [label=" Yes "];
+    J -> M [label=" Yes "];
+    O -> M [label=" Yes "];
+    M -> Q -> R -> S -> T;
+
+    // Kolom 4
+    U [label="Select\\ncandidate"];
+    V [label="Determine\\npay range"];
+    W [label="Make\\nemployment\\noffer"];
+    X [label="Candidate\\naccepts?", shape=diamond, fillcolor="#ffebcc"];
+    Y [label="Hire\\ncandidate", shape=box, style="rounded,filled", fillcolor="#ffcccc"];
+
+    T -> U [label=" Yes "];
+    U -> V -> W -> X;
+    X -> Y [label=" Yes "];
+
+    // Node Rejection di bawah
+    P [label="Rejection", shape=box, style="rounded,filled", fillcolor="#ffcccc"];
+    O -> P [label=" No "];
+    T -> P [label=" No "];
+    X -> P [label=" No "];
+    P -> N; // Kembali ke Gather resumes
+
+    // Menjajarkan baris awal agar rapi
+    { rank=same; A G }
+    { rank=same; E F }
+}`;
+    return {
+      type,
+      flowchartTitle: "Diagram Alir Recruitment Process",
+      caption: "Gambar 1. Diagram Alir Recruitment Process",
+      flowchartText: defaultText,
+      flowchartSteps: []
+    };
+  }
   return { type: "paragraph", text: "" };
 }
 
@@ -653,11 +1192,12 @@ function bindChapterEditor() {
     const field = event.target.dataset.editorField;
     if (!field && !event.target.matches("[data-grid-cell]")) return;
     const chapter = state.chapters[Number(event.target.dataset.chapterIndex)];
-    const section = chapter?.sections[Number(event.target.dataset.sectionIndex)];
+    const section = getEditableSection(chapter, Number(event.target.dataset.sectionIndex), event.target.dataset.subsectionIndex);
     const block = section?.blocks[Number(event.target.dataset.blockIndex)];
     if (field === "paragraph") resizeParagraphTextarea(event.target);
     if (field === "chapterTitle") chapter.title = event.target.value;
     if (field === "sectionTitle") section.title = event.target.value;
+    if (field === "subsectionTitle") section.title = event.target.value;
     if (field === "paragraph") block.text = event.target.value;
     if (field === "listItems") block.items = event.target.value.split("\n");
     if (field === "tableText") block.tableText = event.target.value;
@@ -677,30 +1217,44 @@ function bindChapterEditor() {
         else block.chartSingleData = block.chartData;
       }
     }
+    if (field === "flowchartTitle") block.flowchartTitle = event.target.value;
     if (field === "caption") block.caption = event.target.value;
-    if (field === "chapterTitle" || field === "sectionTitle") renderChapterNav();
+    if (field === "widthCm") block.widthCm = event.target.value;
+    if (field === "flowchartText") {
+      block.flowchartText = event.target.value;
+      block.flowchartSteps = parseFlowchartMarkdown(block.flowchartText);
+      const preview = event.target.closest(".content-block").querySelector("[data-flowchart-preview]");
+      if (preview) preview.innerHTML = flowchartPreviewSVG(block);
+    }
+    if (field === "chapterTitle" || field === "sectionTitle" || field === "subsectionTitle") renderChapterNav();
     if (block?.type === "chart") {
       const preview = event.target.closest(".content-block").querySelector("[data-chart-preview]");
       preview.innerHTML = chartPreviewSVG(block);
+    }
+    if (block?.type === "flowchart" && (field === "flowchartTitle" || field === "caption")) {
+      const preview = event.target.closest(".content-block").querySelector("[data-flowchart-preview]");
+      if (preview) preview.innerHTML = flowchartPreviewSVG(block);
     }
     queueSave();
   });
   host.addEventListener("change", async event => {
     const target = event.target;
     if (target.dataset.editorField === "listStyle") {
-      const block = state.chapters[Number(target.dataset.chapterIndex)].sections[Number(target.dataset.sectionIndex)].blocks[Number(target.dataset.blockIndex)];
+      const section = getEditableSection(state.chapters[Number(target.dataset.chapterIndex)], Number(target.dataset.sectionIndex), target.dataset.subsectionIndex);
+      const block = section.blocks[Number(target.dataset.blockIndex)];
       block.ordered = target.value === "numbered";
       queueSave();
       return;
     }
     if (target.dataset.editorField === "tableInputMode" || target.dataset.editorField === "chartInputMode") {
-      const block = state.chapters[Number(target.dataset.chapterIndex)].sections[Number(target.dataset.sectionIndex)].blocks[Number(target.dataset.blockIndex)];
+      const section = getEditableSection(state.chapters[Number(target.dataset.chapterIndex)], Number(target.dataset.sectionIndex), target.dataset.subsectionIndex);
+      const block = section.blocks[Number(target.dataset.blockIndex)];
       const isTable = target.dataset.editorField === "tableInputMode";
       block[isTable ? "tableInputMode" : "chartInputMode"] = target.value;
       const contentBlock = target.closest(".content-block");
       if (target.value === "grid") {
         const gridEditor = contentBlock.querySelector("[data-grid-editor]");
-        gridEditor.innerHTML = structuredGridHTML(block, `data-chapter-index="${target.dataset.chapterIndex}" data-section-index="${target.dataset.sectionIndex}" data-block-index="${target.dataset.blockIndex}"`);
+        gridEditor.innerHTML = structuredGridHTML(block, `data-chapter-index="${target.dataset.chapterIndex}" data-section-index="${target.dataset.sectionIndex}"${target.dataset.subsectionIndex === undefined ? "" : ` data-subsection-index="${target.dataset.subsectionIndex}"`} data-block-index="${target.dataset.blockIndex}"`);
         resizeStructuredGrid(gridEditor.querySelector(".structured-grid"));
       }
       contentBlock.querySelector("[data-grid-editor]").hidden = target.value !== "grid";
@@ -709,7 +1263,8 @@ function bindChapterEditor() {
       return;
     }
     if (target.dataset.editorField === "chartType") {
-      const block = state.chapters[Number(target.dataset.chapterIndex)].sections[Number(target.dataset.sectionIndex)].blocks[Number(target.dataset.blockIndex)];
+      const section = getEditableSection(state.chapters[Number(target.dataset.chapterIndex)], Number(target.dataset.sectionIndex), target.dataset.subsectionIndex);
+      const block = section.blocks[Number(target.dataset.blockIndex)];
       const wasComparison = isComparisonChart(block.chartType);
       const isComparison = isComparisonChart(target.value);
       if (!wasComparison && isComparison) {
@@ -733,7 +1288,7 @@ function bindChapterEditor() {
         : "Satu kategori per baris, pisahkan nama kategori dan angka dengan |.";
       contentBlock.querySelector("[data-chart-preview]").innerHTML = chartPreviewSVG(block);
       const gridEditor = contentBlock.querySelector("[data-grid-editor]");
-      gridEditor.innerHTML = structuredGridHTML(block, `data-chapter-index="${target.dataset.chapterIndex}" data-section-index="${target.dataset.sectionIndex}" data-block-index="${target.dataset.blockIndex}"`);
+      gridEditor.innerHTML = structuredGridHTML(block, `data-chapter-index="${target.dataset.chapterIndex}" data-section-index="${target.dataset.sectionIndex}"${target.dataset.subsectionIndex === undefined ? "" : ` data-subsection-index="${target.dataset.subsectionIndex}"`} data-block-index="${target.dataset.blockIndex}"`);
       resizeStructuredGrid(gridEditor.querySelector(".structured-grid"));
       queueSave();
       return;
@@ -760,7 +1315,8 @@ function bindChapterEditor() {
         reader.onerror = reject;
         reader.readAsDataURL(blob);
       });
-      const block = state.chapters[Number(target.dataset.chapterIndex)].sections[Number(target.dataset.sectionIndex)].blocks[Number(target.dataset.blockIndex)];
+      const section = getEditableSection(state.chapters[Number(target.dataset.chapterIndex)], Number(target.dataset.sectionIndex), target.dataset.subsectionIndex);
+      const block = section.blocks[Number(target.dataset.blockIndex)];
       block.dataUrl = dataUrl;
       block.caption = block.caption || file.name.replace(/\.[^.]+$/, "");
       renderChapters();
@@ -775,6 +1331,7 @@ function bindChapterEditor() {
     const sectionElement = button.closest(".subchapter-card");
     const chapterIndex = Number(button.dataset.chapterIndex ?? sectionElement?.dataset.chapterIndex);
     const sectionIndex = Number(button.dataset.sectionIndex ?? sectionElement?.dataset.sectionIndex);
+    const subsectionIndex = button.dataset.subsectionIndex;
     const chapter = state.chapters[chapterIndex];
     if (button.dataset.action === "insert-citation") {
       const citationSelect = button.closest(".content-block").querySelector("[data-cite-source]");
@@ -793,20 +1350,127 @@ function bindChapterEditor() {
       textarea.focus();
       return;
     }
-    if (button.dataset.action === "add-section") chapter.sections.push({ title: "", blocks: [] });
+    if (button.dataset.action === "add-section") chapter.sections.push({ title: "", blocks: [], subsections: [] });
     if (button.dataset.action === "delete-chapter") state.chapters.splice(chapterIndex, 1);
     if (button.dataset.action === "delete-section") chapter.sections.splice(sectionIndex, 1);
+    if (button.dataset.action === "add-subsection") chapter.sections[sectionIndex].subsections.push({ title: "", blocks: [] });
+    if (button.dataset.action === "delete-subsection") chapter.sections[sectionIndex].subsections.splice(Number(subsectionIndex), 1);
     if (button.dataset.action === "add-block") {
       const type = sectionElement.querySelector(".block-adder select").value;
-      chapter.sections[sectionIndex].blocks.push(newContentBlock(type));
+      getEditableSection(chapter, sectionIndex, subsectionIndex)?.blocks.push(newContentBlock(type));
     }
     if (button.dataset.action === "delete-block") {
       const blockIndex = Number(button.dataset.blockIndex);
-      chapter.sections[sectionIndex].blocks.splice(blockIndex, 1);
+      getEditableSection(chapter, sectionIndex, subsectionIndex)?.blocks.splice(blockIndex, 1);
+    }
+    if (button.dataset.action === "flowchart-insert-template") {
+      const template = button.dataset.template;
+      const contentBlock = button.closest(".content-block");
+      const textarea = contentBlock.querySelector('[data-editor-field="flowchartText"]');
+      if (!textarea) return;
+
+      const blockIndex = Number(button.dataset.blockIndex);
+      const block = getEditableSection(chapter, sectionIndex, subsectionIndex)?.blocks[blockIndex];
+      if (!block) return;
+
+      const currentVal = textarea.value.trim();
+      const lineCount = currentVal ? currentVal.split(/\r?\n/).length : 0;
+      let templateStr = "";
+      if (template === "dot-step" || template === "mermaid-step") {
+        templateStr = "    Step1 -> Step2 [label=\" Lanjut \"];";
+      } else if (template === "dot-decision" || template === "mermaid-decision") {
+        templateStr = "    Dec1 [label=\"Kondisi\\nSesuai?\", shape=diamond, fillcolor=\"#ffebcc\"];\n    Dec1 -> StepNext [label=\" Yes \"];\n    Dec1 -> StepAlt [label=\" No \"];";
+      } else if (template === "dot-example" || template === "mermaid-example") {
+        templateStr = `digraph RecruitmentProcess {
+    // Pengaturan bentuk garis menjadi siku-siku (ortogonal)
+    graph [splines=ortho, nodesep=0.6, ranksep=0.6, fontname="Arial"];
+    node [shape=box, style=filled, fillcolor="#cce5ff", fontname="Arial", fontsize=11, width=1.5];
+    edge [fontname="Arial", fontsize=10];
+
+    // Kolom 1
+    A [label="Identify\\nstaffing need", shape=box, style="rounded,filled", fillcolor="#ffcccc"];
+    B [label="Define and\\nwrite up job\\ndescription"];
+    C [label="Send personnel\\nrequest from\\nto HR"];
+    D [label="Determine\\nclassification"];
+    E [label="Regular\\nhire?", shape=diamond, fillcolor="#ffebcc"];
+    F [label="Temp hiring\\nprocess", shape=box, style="rounded,filled"];
+
+    A -> B -> C -> D -> E;
+    E -> F [label=" No "];
+
+    // Kolom 2
+    G [label="Post Job\\nInternally"];
+    H [label="Suitable\\ncandidate?", shape=diamond, fillcolor="#ffebcc"];
+    I [label="Examine\\nexisting\\nresumes on file"];
+    J [label="Suitable\\ncandidate?", shape=diamond, fillcolor="#ffebcc"];
+    K [label="Develop\\nrecruitment\\nstrategy"];
+    L [label="Place ads"];
+    N [label="Gather\\nresumes"];
+    O [label="Resume\\nqualified?", shape=diamond, fillcolor="#ffebcc"];
+
+    E -> G [label=" Yes "];
+    G -> H;
+    H -> I [label=" No "];
+    I -> J;
+    J -> K [label=" No "];
+    K -> L -> N -> O;
+
+    // Kolom 3
+    M [label="Arrange\\nmeeting with\\ncandidate"];
+    Q [label="Conduct\\npreliminary\\ninterview"];
+    R [label="Develop\\ninterview\\nquestions"];
+    S [label="Conduct\\ninterview"];
+    T [label="References\\nOK?", shape=diamond, fillcolor="#ffebcc"];
+
+    H -> M [label=" Yes "];
+    J -> M [label=" Yes "];
+    O -> M [label=" Yes "];
+    M -> Q -> R -> S -> T;
+
+    // Kolom 4
+    U [label="Select\\ncandidate"];
+    V [label="Determine\\npay range"];
+    W [label="Make\\nemployment\\noffer"];
+    X [label="Candidate\\naccepts?", shape=diamond, fillcolor="#ffebcc"];
+    Y [label="Hire\\ncandidate", shape=box, style="rounded,filled", fillcolor="#ffcccc"];
+
+    T -> U [label=" Yes "];
+    U -> V -> W -> X;
+    X -> Y [label=" Yes "];
+
+    // Node Rejection di bawah
+    P [label="Rejection", shape=box, style="rounded,filled", fillcolor="#ffcccc"];
+    O -> P [label=" No "];
+    T -> P [label=" No "];
+    X -> P [label=" No "];
+    P -> N; // Kembali ke Gather resumes
+
+    // Menjajarkan baris awal agar rapi
+    { rank=same; A G }
+    { rank=same; E F }
+}`;
+      } else {
+        templateStr = "    NewNode [label=\"Node Baru\"];";
+      }
+
+      let newText = currentVal ? `${currentVal}\n${templateStr}` : templateStr;
+      if (template === "dot-example" || template === "mermaid-example") {
+        newText = templateStr;
+      }
+      textarea.value = newText;
+      block.flowchartText = newText;
+      block.flowchartSteps = parseFlowchartMarkdown(newText);
+
+      const preview = contentBlock.querySelector("[data-flowchart-preview]");
+      if (preview) preview.innerHTML = flowchartPreviewSVG(block);
+      queueSave();
+      textarea.focus();
+      return;
     }
     if (button.dataset.action === "grid-add-row" || button.dataset.action === "grid-add-column" || button.dataset.action === "grid-delete-column") {
       const blockIndex = Number(button.dataset.blockIndex);
-      const block = chapter.sections[sectionIndex].blocks[blockIndex];
+      const block = getEditableSection(chapter, sectionIndex, subsectionIndex)?.blocks[blockIndex];
+      if (!block) return;
       const rows = structuredRowsForBlock(block);
       if (button.dataset.action === "grid-add-row") {
         rows.push(Array(rows[0].length).fill(""));
@@ -1058,29 +1722,375 @@ function chartPreviewSVG(block) {
   return `<svg class="chart-svg" viewBox="0 0 640 280" role="img" aria-label="${escapeAttr(block.chartTitle || "Pratinjau grafik")}">${title}${drawing}</svg>`;
 }
 
+function isMermaidSyntax(text) {
+  if (!text) return false;
+  const t = text.trim();
+  return /^\s*(graph|flowchart)\s+/i.test(t) || t.includes("-->");
+}
+
+let vizInstance = null;
+function getViz() {
+  if (!vizInstance && typeof Viz !== "undefined") {
+    try {
+      vizInstance = new Viz();
+    } catch (e) {
+      console.warn("Viz initialization error:", e);
+    }
+  }
+  return vizInstance;
+}
+
+function rasterizeSvgToDataUrl(svgEl, block) {
+  try {
+    const svgData = new XMLSerializer().serializeToString(svgEl);
+    const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+    const URL = window.URL || window.webkitURL || window;
+    const blobURL = URL.createObjectURL(svgBlob);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const scale = 2; // high-dpi
+      const bbox = svgEl.getBoundingClientRect();
+      const width = Math.max(svgEl.viewBox?.baseVal?.width || 0, bbox.width || 600);
+      const height = Math.max(svgEl.viewBox?.baseVal?.height || 0, bbox.height || 400);
+      canvas.width = Math.max(100, width * scale);
+      canvas.height = Math.max(100, height * scale);
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(blobURL);
+      block.dataUrl = canvas.toDataURL("image/png");
+    };
+    img.src = blobURL;
+  } catch (err) {
+    console.warn("Rasterize error:", err);
+  }
+}
+
+function flowchartPreviewSVG(block) {
+  const text = (block.flowchartText || "").trim();
+
+  // If input is Graphviz DOT syntax
+  if (isGraphvizDot(text)) {
+    const uniqueId = `viz_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    setTimeout(async () => {
+      const container = document.getElementById(uniqueId);
+      if (!container) return;
+      try {
+        const viz = getViz();
+        if (!viz) {
+          container.innerHTML = `<div style="padding:10px 14px;background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:6px;font-size:12px;"><strong>⚠️ Library Graphviz (Viz.js) belum termuat.</strong></div>`;
+          return;
+        }
+        const svgEl = await viz.renderSVGElement(text);
+        svgEl.style.maxWidth = "100%";
+        svgEl.style.height = "auto";
+        svgEl.style.display = "block";
+        svgEl.style.margin = "0 auto";
+        svgEl.style.background = "#ffffff";
+        container.innerHTML = "";
+        container.appendChild(svgEl);
+
+        // Rasterize to PNG for Word DOCX
+        rasterizeSvgToDataUrl(svgEl, block);
+      } catch (err) {
+        container.innerHTML = `<div style="padding:10px 14px;background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:6px;font-size:12px;text-align:left;"><strong>⚠️ Kesalahan Sintaks Graphviz (DOT):</strong><br><pre style="white-space:pre-wrap;margin-top:4px;font-family:monospace;">${escapeHtml(err.message || String(err))}</pre></div>`;
+      }
+    }, 40);
+
+    return `<div id="${uniqueId}" class="graphviz-diagram-wrap" style="overflow-x:auto;width:100%;padding:10px 0;text-align:center;"><p style="color:var(--muted);font-size:12px;">Memuat diagram Graphviz (DOT)…</p></div>`;
+  }
+
+  // If input is Mermaid syntax
+  if (isMermaidSyntax(text)) {
+    ensureMermaid();
+    const uniqueId = `mermaid_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    
+    // We render an async mermaid container
+    setTimeout(async () => {
+      const container = document.getElementById(uniqueId);
+      if (!container) return;
+      try {
+        if (typeof mermaid !== "undefined") {
+          const { svg } = await mermaid.render(`svg_${uniqueId}`, text);
+          container.innerHTML = svg;
+          const svgEl = container.querySelector("svg");
+          if (svgEl) {
+            svgEl.style.maxWidth = "100%";
+            svgEl.style.height = "auto";
+            svgEl.style.display = "block";
+            svgEl.style.margin = "0 auto";
+
+            rasterizeSvgToDataUrl(svgEl, block);
+          }
+        }
+      } catch (err) {
+        container.innerHTML = `<div style="padding:10px 14px;background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:6px;font-size:12px;"><strong>⚠️ Kesalahan Format Mermaid:</strong><br>${escapeHtml(err.message || String(err))}</div>`;
+      }
+    }, 50);
+
+    return `<div id="${uniqueId}" class="mermaid-diagram-wrap" style="overflow-x:auto;width:100%;padding:10px 0;text-align:center;"><p style="color:var(--muted);font-size:12px;">Memuat diagram Mermaid…</p></div>`;
+  }
+
+  const steps = block.flowchartSteps || [];
+  if (!steps.length) return '<p class="chart-preview-empty">Belum ada langkah flowchart. Tambahkan teks alur di atas.</p>';
+
+  const boxW = 230;
+  const boxH = 42;
+  const gapY = 26;
+  const startX = 40;
+  const startY = 20;
+  const totalHeight = startY * 2 + steps.length * boxH + (steps.length - 1) * gapY;
+  const cx = startX + boxW / 2;
+
+  let shapesHTML = "";
+  for (let i = 0; i < steps.length; i++) {
+    const step = steps[i];
+    const y = startY + i * (boxH + gapY);
+    const shape = step.shape || "process";
+    const text = escapeHtml(step.text || `Langkah ${i + 1}`);
+
+    let shapeSVG = "";
+    if (shape === "terminator") {
+      shapeSVG = `<rect x="${startX}" y="${y}" width="${boxW}" height="${boxH}" rx="25" ry="25" fill="#f8fafc" stroke="#1e293b" stroke-width="2"/>`;
+    } else if (shape === "decision") {
+      const pTop = `${cx},${y}`;
+      const pRight = `${startX + boxW},${y + boxH / 2}`;
+      const pBottom = `${cx},${y + boxH}`;
+      const pLeft = `${startX},${y + boxH / 2}`;
+      shapeSVG = `<polygon points="${pTop} ${pRight} ${pBottom} ${pLeft}" fill="#f8fafc" stroke="#1e293b" stroke-width="2"/>`;
+    } else if (shape === "io") {
+      const off = 25;
+      const pts = `${startX + off},${y} ${startX + boxW},${y} ${startX + boxW - off},${y + boxH} ${startX},${y + boxH}`;
+      shapeSVG = `<polygon points="${pts}" fill="#f8fafc" stroke="#1e293b" stroke-width="2"/>`;
+    } else {
+      shapeSVG = `<rect x="${startX}" y="${y}" width="${boxW}" height="${boxH}" rx="4" fill="#f8fafc" stroke="#1e293b" stroke-width="2"/>`;
+    }
+
+    const textSVG = `<text x="${cx}" y="${y + boxH / 2 + 4}" text-anchor="middle" font-family="'Times New Roman', serif" font-size="11.5" font-weight="600" fill="#0f172a">${text}</text>`;
+    shapesHTML += shapeSVG + textSVG;
+
+    if (i < steps.length - 1) {
+      const nextY = y + boxH + gapY;
+      const arrowLine = `<line x1="${cx}" y1="${y + boxH}" x2="${cx}" y2="${nextY}" stroke="#1e293b" stroke-width="2"/>`;
+      const arrowHead = `<polygon points="${cx - 5},${nextY - 7} ${cx + 5},${nextY - 7} ${cx},${nextY}" fill="#1e293b"/>`;
+      
+      let labelDown = "";
+      if (shape === "decision") {
+        const branchAssign = step.branchAssign || "sideYes_straightNo";
+        const straightText = branchAssign === "sideYes_straightNo" ? "No ↓" : "Yes ↓";
+        const straightColor = branchAssign === "sideYes_straightNo" ? "#dc2626" : "#15803d";
+        labelDown = `<text x="${cx + 8}" y="${y + boxH + gapY / 2 + 4}" font-family="'Times New Roman', serif" font-size="11" font-weight="bold" fill="${straightColor}">${straightText}</text>`;
+      }
+      shapesHTML += arrowLine + arrowHead + labelDown;
+    }
+
+    if (shape === "decision") {
+      const branchType = step.branchType || (step.sideSteps?.length || step.sideNodeText ? "node" : "jump");
+      const branchAssign = step.branchAssign || "sideYes_straightNo";
+      const sideTextLabel = branchAssign === "sideYes_straightNo" ? "Yes →" : "No →";
+      const sideLabelColor = branchAssign === "sideYes_straightNo" ? "#15803d" : "#dc2626";
+
+      const sideSteps = (step.sideSteps && step.sideSteps.length > 0) 
+        ? step.sideSteps 
+        : (step.sideNodeText ? [{ shape: step.sideNodeShape || "process", text: step.sideNodeText }] : []);
+
+      if (branchType === "node" && sideSteps.length > 0) {
+        const sideBoxW = 165;
+        const sideBoxH = 46;
+        const sideGapY = 36;
+        const sideX = startX + boxW + 45;
+        const sideCx = sideX + sideBoxW / 2;
+
+        let lastSideCy = y + boxH / 2;
+
+        for (let sIdx = 0; sIdx < sideSteps.length; sIdx++) {
+          const sStep = sideSteps[sIdx];
+          const sShape = sStep.shape || "process";
+          const sText = escapeHtml(sStep.text || `Side ${sIdx + 1}`);
+          const sY = y + (boxH - sideBoxH) / 2 + sIdx * (sideBoxH + sideGapY);
+          const sCy = sY + sideBoxH / 2;
+          lastSideCy = sCy;
+
+          if (sIdx === 0) {
+            const arrowToSide = `<line x1="${startX + boxW}" y1="${y + boxH / 2}" x2="${sideX}" y2="${sCy}" stroke="#1e293b" stroke-width="2"/>`;
+            const headToSide = `<polygon points="${sideX - 7},${sCy - 5} ${sideX - 7},${sCy + 5} ${sideX},${sCy}" fill="#1e293b"/>`;
+            const labelSide = `<text x="${startX + boxW + 8}" y="${y + boxH / 2 - 6}" font-family="'Times New Roman', serif" font-size="11" font-weight="bold" fill="${sideLabelColor}">${sideTextLabel}</text>`;
+            shapesHTML += arrowToSide + headToSide + labelSide;
+          } else {
+            const prevY = y + (boxH - sideBoxH) / 2 + (sIdx - 1) * (sideBoxH + sideGapY) + sideBoxH;
+            const arrowDown = `<line x1="${sideCx}" y1="${prevY}" x2="${sideCx}" y2="${sY}" stroke="#1e293b" stroke-width="2"/>`;
+            const headDown = `<polygon points="${sideCx - 5},${sY - 7} ${sideCx + 5},${sY - 7} ${sideCx},${sY}" fill="#1e293b"/>`;
+            shapesHTML += arrowDown + headDown;
+          }
+
+          let sideSVG = "";
+          if (sShape === "decision") {
+            const pTop = `${sideCx},${sY}`;
+            const pRight = `${sideX + sideBoxW},${sCy}`;
+            const pBottom = `${sideCx},${sY + sideBoxH}`;
+            const pLeft = `${sideX},${sCy}`;
+            sideSVG = `<polygon points="${pTop} ${pRight} ${pBottom} ${pLeft}" fill="#fef08a" stroke="#1e293b" stroke-width="2"/>`;
+          } else if (sShape === "io") {
+            const off = 16;
+            const pts = `${sideX + off},${sY} ${sideX + sideBoxW},${sY} ${sideX + sideBoxW - off},${sY + sideBoxH} ${sideX},${sY + sideBoxH}`;
+            sideSVG = `<polygon points="${pts}" fill="#fef08a" stroke="#1e293b" stroke-width="2"/>`;
+          } else if (sShape === "terminator") {
+            sideSVG = `<rect x="${sideX}" y="${sY}" width="${sideBoxW}" height="${sideBoxH}" rx="23" ry="23" fill="#fbcfe8" stroke="#1e293b" stroke-width="2"/>`;
+          } else {
+            sideSVG = `<rect x="${sideX}" y="${sY}" width="${sideBoxW}" height="${sideBoxH}" rx="4" fill="#fef08a" stroke="#1e293b" stroke-width="2"/>`;
+          }
+          const sideTextSVG = `<text x="${sideCx}" y="${sCy + 4}" text-anchor="middle" font-family="'Times New Roman', serif" font-size="11.5" font-weight="600" fill="#0f172a">${sText}</text>`;
+          shapesHTML += sideSVG + sideTextSVG;
+        }
+
+        const rejoinIdx = step.sideRejoinTarget !== undefined && step.sideRejoinTarget !== null && step.sideRejoinTarget !== "" 
+          ? Number(step.sideRejoinTarget) 
+          : (i + 2 < steps.length ? i + 2 : null);
+
+        if (rejoinIdx !== null && rejoinIdx >= 0 && rejoinIdx < steps.length) {
+          const rejoinY = startY + rejoinIdx * (boxH + gapY) + boxH / 2;
+          let rejoinPathSVG = "";
+          let rejoinArrowHead = "";
+          if (Math.abs(lastSideCy - rejoinY) < 10) {
+            rejoinPathSVG = `<line x1="${sideX}" y1="${rejoinY}" x2="${startX + boxW}" y2="${rejoinY}" stroke="#1e293b" stroke-width="2"/>`;
+            rejoinArrowHead = `<polygon points="${startX + boxW + 7},${rejoinY - 5} ${startX + boxW + 7},${rejoinY + 5} ${startX + boxW},${rejoinY}" fill="#1e293b"/>`;
+          } else {
+            const midX = (sideX + (startX + boxW)) / 2;
+            const rejoinPathD = `M ${sideX} ${lastSideCy} L ${midX} ${lastSideCy} L ${midX} ${rejoinY} L ${startX + boxW} ${rejoinY}`;
+            rejoinPathSVG = `<path d="${rejoinPathD}" fill="none" stroke="#1e293b" stroke-width="2"/>`;
+            rejoinArrowHead = `<polygon points="${startX + boxW + 7},${rejoinY - 5} ${startX + boxW + 7},${rejoinY + 5} ${startX + boxW},${rejoinY}" fill="#1e293b"/>`;
+          }
+          shapesHTML += rejoinPathSVG + rejoinArrowHead;
+        }
+      } else if (step.branchNoTarget !== undefined && step.branchNoTarget !== null && step.branchNoTarget !== "") {
+        const targetIdx = Number(step.branchNoTarget);
+        if (targetIdx >= 0 && targetIdx < steps.length) {
+          const targetY = startY + targetIdx * (boxH + gapY) + boxH / 2;
+          const currentMidY = y + boxH / 2;
+          const branchRightX = startX + boxW + 45;
+
+          const pathD = `M ${startX + boxW} ${currentMidY} L ${branchRightX} ${currentMidY} L ${branchRightX} ${targetY} L ${startX + boxW} ${targetY}`;
+          const branchPath = `<path d="${pathD}" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="4,3"/>`;
+          const arrowHeadNo = `<polygon points="${startX + boxW + 7},${targetY - 5} ${startX + boxW + 7},${targetY + 5} ${startX + boxW},${targetY}" fill="#dc2626"/>`;
+          const labelNo = `<text x="${startX + boxW + 8}" y="${currentMidY - 6}" font-family="'Times New Roman', serif" font-size="11" font-weight="bold" fill="#dc2626">${sideTextLabel}</text>`;
+          shapesHTML += branchPath + arrowHeadNo + labelNo;
+        }
+      }
+    }
+  }
+
+  let maxSideItems = 0;
+  for (let s of steps) {
+    if (s.shape === "decision" && s.branchType === "node" && s.sideSteps?.length) {
+      maxSideItems = Math.max(maxSideItems, s.sideSteps.length);
+    }
+  }
+  const svgWidth = maxSideItems > 0 ? 490 : 320;
+  const computedHeight = Math.max(totalHeight, startY * 2 + maxSideItems * 72 + 80);
+
+  return `<div style="overflow-x:auto;width:100%;padding:6px 0;"><svg class="flowchart-svg" viewBox="0 0 ${svgWidth} ${computedHeight}" style="max-width:${svgWidth}px;width:100%;height:auto;display:block;margin:0 auto;" role="img" aria-label="Diagram Alir">${shapesHTML}</svg></div>`;
+}
+
+function renderMathToHTML(str) {
+  if (!str) return "";
+  // Cari pola $...$ atau $$...$$
+  return String(str).replace(/(\$\$.*?\$\$|\$.*?\$)/g, (match, expr) => {
+    let raw = expr.startsWith("$$") ? expr.slice(2, -2) : expr.slice(1, -1);
+    raw = raw.trim();
+
+    let s = escapeHtml(raw);
+
+    // Render perkalian & minus & persen & panah
+    s = s.replace(/\\times/g, " &times; ");
+    s = s.replace(/\\minus/g, " &minus; ");
+    s = s.replace(/\\(?:to|rightarrow)\b/g, " &rarr; ");
+    s = s.replace(/\\%/g, "%");
+
+    // Render \text{...}
+    s = s.replace(/\\text\{([^{}]+)\}/g, '<span class="m-text">$1</span>');
+
+    // Render sum with bounds \sum_{lower}^{upper} atau \sum_{lower}
+    s = s.replace(/\\sum_\{([^{}]+)\}\^\{([^{}]+)\}/g, '<span class="m-sum"><span class="m-sup-bound">$2</span><span class="m-op-symbol">&sum;</span><span class="m-sub-bound">$1</span></span>');
+    s = s.replace(/\\sum_\{([^{}]+)\}\^([a-zA-Z0-9])/g, '<span class="m-sum"><span class="m-sup-bound">$2</span><span class="m-op-symbol">&sum;</span><span class="m-sub-bound">$1</span></span>');
+    s = s.replace(/\\sum_\{([^{}]+)\}/g, '<span class="m-sum"><span class="m-op-symbol">&sum;</span><span class="m-sub-bound">$1</span></span>');
+    s = s.replace(/\\sum\b/g, '<span class="m-op-symbol">&sum;</span>');
+
+    // Render fractions \frac{a}{b} (bisa bersarang 1 tingkat)
+    for (let i = 0; i < 3; i++) {
+      s = s.replace(/\\frac\{((?:[^{}]|\{[^{}]*\})*)\}\{((?:[^{}]|\{[^{}]*\})*)\}/g, '<span class="m-frac"><span class="m-num">$1</span><span class="m-den">$2</span></span>');
+    }
+
+    // Render superscript ^{sup} dan ^x
+    s = s.replace(/\^\{([^{}]+)\}/g, '<sup>$1</sup>');
+    s = s.replace(/\^([a-zA-Z0-9])/g, '<sup>$1</sup>');
+
+    // Render subscript _{sub} dan _x
+    s = s.replace(/_\{([^{}]+)\}/g, '<sub>$1</sub>');
+    s = s.replace(/_([a-zA-Z0-9])/g, '<sub>$1</sub>');
+
+    // Hapus sisa kurung kurawal pembungkus sederhana jika ada
+    s = s.replace(/\{([^{}]+)\}/g, '$1');
+
+    return `<span class="math-expr">${s}</span>`;
+  });
+}
+
 function previewBlockHTML(block) {
   if (block.type === "paragraph") {
-    return (block.text || "").split(/\n\n+/).filter(text => text.trim()).map(text => `<p>${escapeHtml(resolveCitationTokens(text)).replace(/\n/g, "<br>")}</p>`).join("");
+    return (block.text || "").split(/\n\n+/).filter(text => text.trim()).map(text => {
+      const resolved = resolveCitationTokens(text);
+      // Escape HTML selain formula math
+      const parts = resolved.split(/(\$\$.*?\$\$|\$.*?\$)/g);
+      const htmlOutput = parts.map(part => {
+        if ((part.startsWith("$$") && part.endsWith("$$")) || (part.startsWith("$") && part.endsWith("$"))) {
+          return renderMathToHTML(part);
+        }
+        return escapeHtml(part).replace(/\n/g, "<br>");
+      }).join("");
+      return `<p>${htmlOutput}</p>`;
+    }).join("");
   }
   if (block.type === "list") {
     const tag = block.ordered === false ? "ul" : "ol";
-    const items = (block.items || []).filter(item => String(item).trim()).map(item => `<li>${escapeHtml(item)}</li>`).join("");
+    const items = (block.items || []).filter(item => String(item).trim()).map(item => `<li>${renderMathToHTML(item)}</li>`).join("");
     return items ? `<${tag}>${items}</${tag}>` : "";
   }
   if (block.type === "image") {
     if (!String(block.dataUrl || "").startsWith("data:image/")) return "";
-    return `<figure><img src="${escapeAttr(block.dataUrl)}" alt="${escapeAttr(block.caption || "Gambar")}">${block.caption ? `<figcaption>${escapeHtml(block.caption)}</figcaption>` : ""}</figure>`;
+    const customWidthPx = block.widthCm ? Math.round(parseFloat(block.widthCm) * 37.8) : null;
+    const styleAttr = customWidthPx ? `style="max-width:${customWidthPx}px;width:100%;height:auto;"` : `style="max-width:440px;width:100%;height:auto;"`;
+    return `<figure><img src="${escapeAttr(block.dataUrl)}" alt="${escapeAttr(block.caption || "Gambar")}" ${styleAttr}>${block.caption ? `<figcaption>${escapeHtml(block.caption)}</figcaption>` : ""}</figure>`;
   }
   if (block.type === "table") {
     const rows = (block.tableText || "").split(/\r?\n/).filter(row => row.trim()).map(row => row.split("|").map(cell => cell.trim()));
     if (!rows.length) return "";
     const header = rows[0].map(cell => `<th>${escapeHtml(cell)}</th>`).join("");
-    const body = rows.slice(1).map(row => `<tr>${row.map(cell => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`).join("");
-    return `<table><thead><tr>${header}</tr></thead><tbody>${body}</tbody></table>`;
+    const body = rows.slice(1).map(row => `<tr>${row.map(cell => {
+      // Izinkan pemisah baris di dalam sel jika ada \n atau <br>
+      const subLines = cell.split(/(?:<br\s*\/?>|\n)/gi);
+      const renderedSubLines = subLines.map(subLine => {
+        const parts = subLine.split(/(\$\$.*?\$\$|\$.*?\$)/g);
+        return parts.map(part => {
+          if ((part.startsWith("$$") && part.endsWith("$$")) || (part.startsWith("$") && part.endsWith("$"))) {
+            return renderMathToHTML(part);
+          }
+          return escapeHtml(part);
+        }).join("");
+      });
+      return `<td>${renderedSubLines.join("<br>")}</td>`;
+    }).join("")}</tr>`).join("");
+    const caption = block.caption || block.title || "";
+    return `<div class="preview-table-wrap">${caption ? `<p class="preview-table-caption"><strong>${escapeHtml(caption)}</strong></p>` : ""}<table class="apa-open-table"><thead><tr>${header}</tr></thead><tbody>${body}</tbody></table></div>`;
   }
   if (block.type === "chart") {
     const caption = block.caption || block.chartTitle || "";
     return `<figure class="preview-chart">${chartPreviewSVG(block)}${caption ? `<figcaption>${escapeHtml(caption)}</figcaption>` : ""}</figure>`;
+  }
+  if (block.type === "flowchart") {
+    const caption = block.caption || block.flowchartTitle || "Gambar Diagram Alir Penelitian";
+    return `<figure class="preview-flowchart" style="margin:16px 0;text-align:center;">${flowchartPreviewSVG(block)}${caption ? `<figcaption style="margin-top:8px;font-size:10pt;font-style:italic;">${escapeHtml(caption)}</figcaption>` : ""}</figure>`;
   }
   return "";
 }
@@ -1089,19 +2099,21 @@ function citedSourceEntries() {
   const sourceById = new Map(state.sources.map(source => [source.id, source]));
   const entries = [];
   const seen = new Set();
-  for (const chapter of state.chapters) {
-    for (const section of chapter.sections || []) {
-      for (const block of section.blocks || []) {
-        if (block.type !== "paragraph") continue;
-        for (const match of (block.text || "").matchAll(/\[\[cite:([a-zA-Z0-9_-]+)\]\]/g)) {
-          const source = sourceById.get(match[1]);
-          if (source && !seen.has(source.id)) {
-            seen.add(source.id);
-            entries.push(source);
-          }
+  const collectSectionCitations = section => {
+    for (const block of section.blocks || []) {
+      if (block.type !== "paragraph") continue;
+      for (const match of (block.text || "").matchAll(/\[\[cite:([a-zA-Z0-9_-]+)\]\]/g)) {
+        const source = sourceById.get(match[1]);
+        if (source && !seen.has(source.id)) {
+          seen.add(source.id);
+          entries.push(source);
         }
       }
     }
+    for (const subsection of section.subsections || []) collectSectionCitations(subsection);
+  };
+  for (const chapter of state.chapters) {
+    for (const section of chapter.sections || []) collectSectionCitations(section);
   }
   return entries;
 }
@@ -1192,7 +2204,9 @@ function renderDocumentPreview() {
   const tocHTML = state.chapters.map((chapter, chapterIndex) => `
     <li class="preview-toc-chapter">BAB ${chapterIndex + 1} ${escapeHtml((chapter.title || `Bab ${chapterIndex + 1}`).toUpperCase())}</li>
     ${(chapter.sections || []).map((section, sectionIndex) => `
-      <li class="preview-toc-section">${chapterIndex + 1}.${sectionIndex + 1} ${escapeHtml(section.title || `Subbab ${sectionIndex + 1}`)}</li>`).join("")}`).join("");
+      <li class="preview-toc-section">${chapterIndex + 1}.${sectionIndex + 1} ${escapeHtml(section.title || `Subbab ${sectionIndex + 1}`)}</li>
+      ${(section.subsections || []).map((subsection, subsectionIndex) => `
+        <li class="preview-toc-subsection">${chapterIndex + 1}.${sectionIndex + 1}.${subsectionIndex + 1} ${escapeHtml(subsection.title || `Sub-subbab ${subsectionIndex + 1}`)}</li>`).join("")}`).join("")}`).join("");
   const chaptersHTML = state.chapters.map((chapter, chapterIndex) => `
     <section class="preview-chapter">
       <h1>BAB ${chapterIndex + 1} ${(chapter.title || `Bab ${chapterIndex + 1}`).toUpperCase()}</h1>
@@ -1200,6 +2214,11 @@ function renderDocumentPreview() {
         <section class="preview-subchapter">
           <h2>${chapterIndex + 1}.${sectionIndex + 1} ${escapeHtml(section.title || `Subbab ${sectionIndex + 1}`)}</h2>
           ${(section.blocks || []).map(previewBlockHTML).join("")}
+          ${(section.subsections || []).map((subsection, subsectionIndex) => `
+            <section class="preview-subsubchapter">
+              <h3>${chapterIndex + 1}.${sectionIndex + 1}.${subsectionIndex + 1} ${escapeHtml(subsection.title || `Sub-subbab ${subsectionIndex + 1}`)}</h3>
+              ${(subsection.blocks || []).map(previewBlockHTML).join("")}
+            </section>`).join("")}
         </section>`).join("")}
     </section>`).join("");
   const citedSources = referenceSourceEntries();
@@ -1211,33 +2230,151 @@ function renderDocumentPreview() {
     ...(state.referensi || []).filter(reference => String(reference).trim()),
     ...sortedSources.map(source => formatSourceReference(source, numbers.get(source.id)))
   ];
+  const abstract = state.abstrak || {};
+  const persantunanText = (state.persantunan || "").trim();
+  const prodiClean = (identity.programStudi || "Teknik Informatika").replace(/PROGRAM STUDI/i, "").trim();
+  const fakultasClean = (identity.fakultas || "Fakultas Komunikasi dan Informatika").replace(/FAKULTAS/i, "").trim();
+
   document.getElementById("docPreview").innerHTML = `
+    <!-- HALAMAN 1: COVER -->
     <article class="preview-page preview-cover">
-      <div><h1>${escapeHtml(title.toUpperCase())}</h1><img class="preview-logo" src="/assets/logo_ums.png" alt="Logo Universitas Muhammadiyah Surakarta"><p>PROPOSAL SKRIPSI</p><p class="cover-description">Disusun sebagai salah satu syarat penyusunan skripsi</p></div>
-      <div class="cover-author"><strong>${escapeHtml(identity.nama || "Nama")}</strong><span>${escapeHtml(identity.nim || "NIM")}</span></div>
-      <div class="cover-institution"><strong>${escapeHtml(identity.programStudi || "")}</strong><strong>${escapeHtml(identity.fakultas || "")}</strong><strong>${escapeHtml(identity.universitas || "")}</strong><strong>${escapeHtml(identity.tahun || "")}</strong></div>
+      <div>
+        <h1 class="cover-title">${escapeHtml((identity.judul || "JUDUL NASKAH PUBLIKASI ILMIAH MAHASISWA").toUpperCase())}</h1>
+        <img class="preview-logo" src="/assets/logo_ums.png" alt="Logo Universitas Muhammadiyah Surakarta">
+        <p class="cover-type"><strong>PUBLIKASI ILMIAH</strong></p>
+        <p class="cover-description">Disusun sebagai salah satu syarat menyelesaikan Program Studi Strata I pada<br>Program Studi ${escapeHtml(prodiClean)} Fakultas ${escapeHtml(fakultasClean)}</p>
+      </div>
+      <div class="cover-author">
+        <p>Oleh:</p>
+        <strong style="text-decoration:underline;">${escapeHtml((identity.nama || "NAMA LENGKAP MAHASISWA").toUpperCase())}</strong>
+        <span><strong>${escapeHtml(identity.nim || "L200070150")}</strong></span>
+      </div>
+      <div class="cover-institution">
+        <strong>${escapeHtml((identity.programStudi || "PROGRAM STUDI TEKNIK INFORMATIKA").toUpperCase())}</strong>
+        <strong>${escapeHtml((identity.fakultas || "FAKULTAS KOMUNIKASI DAN INFORMATIKA").toUpperCase())} ${escapeHtml((identity.universitas || "UNIVERSITAS MUHAMMADIYAH SURAKARTA").toUpperCase())}</strong>
+        <strong>${escapeHtml(identity.tahun || "2023")}</strong>
+      </div>
     </article>
+
+    <!-- HALAMAN 2: HALAMAN PERSETUJUAN -->
     <article class="preview-page preview-approval">
-      <h1>HALAMAN PERSETUJUAN</h1>
-      <h2>PROPOSAL SKRIPSI</h2>
-      <h3>${escapeHtml(title.toUpperCase())}</h3>
-      <p>Oleh:</p>
-      <strong>${escapeHtml((identity.nama || "Nama").toUpperCase())}</strong>
-      <strong>${escapeHtml(identity.nim || "NIM")}</strong>
-      <p class="approval-statement">Telah diperiksa dan disetujui untuk diajukan pada tahapan akademik selanjutnya.</p>
-      <div class="approval-signature"><p>Surakarta, __________________ ${escapeHtml(identity.tahun || "")}</p><p>Dosen Pembimbing</p><div class="signature-space"></div><strong>${escapeHtml(identity.pembimbing || "______________________________")}</strong><span>NIDN/NIK. ${escapeHtml(identity.nidn || "__________________")}</span></div>
+      <div class="preview-header-num">1</div>
+      <h1 class="doc-subheading">HALAMAN PERSETUJUAN</h1>
+      <h2 class="doc-maintitle">${escapeHtml((identity.judul || "JUDUL NASKAH PUBLIKASI ILMIAH MAHASISWA").toUpperCase())}</h2>
+      <p class="doc-tagline"><strong>PUBLIKASI ILMIAH</strong></p>
+      <p class="doc-by">oleh:</p>
+      <strong style="text-decoration:underline;">${escapeHtml((identity.nama || "NAMA LENGKAP MAHASISWA").toUpperCase())}</strong>
+      <strong style="display:block;margin-bottom:28px;">${escapeHtml(identity.nim || "L200070150")}</strong>
+      <p class="approval-statement">Telah diperiksa dan disetujui untuk diuji oleh:<br>Dosen Pembimbing</p>
+      <div class="approval-signature" style="margin-top:40px;">
+        <div class="signature-space"></div>
+        <strong style="text-decoration:underline;">${escapeHtml(identity.pembimbing || "Dr. Dosen Pembimbing, M.Sc.")}</strong>
+        <span><strong>NIDN.${escapeHtml(identity.nidn || "123")}</strong></span>
+      </div>
     </article>
-    <article class="preview-page preview-toc">
-      <h1>DAFTAR ISI</h1>
-      <ol class="preview-toc-list">${tocHTML}${references.length ? '<li class="preview-toc-chapter">DAFTAR PUSTAKA</li>' : ""}</ol>
+
+    <!-- HALAMAN 3: HALAMAN PENGESAHAN -->
+    <article class="preview-page preview-approval">
+      <div class="preview-header-num">2</div>
+      <h1 class="doc-subheading">HALAMAN PENGESAHAN</h1>
+      <h2 class="doc-maintitle">${escapeHtml((identity.judul || "JUDUL NASKAH PUBLIKASI ILMIAH MAHASISWA").toUpperCase())}</h2>
+      <p class="doc-by">OLEH</p>
+      <strong style="text-decoration:underline;">${escapeHtml((identity.nama || "NAMA LENGKAP MAHASISWA").toUpperCase())}</strong>
+      <strong style="display:block;margin-bottom:16px;">${escapeHtml(identity.nim || "L200070150")}</strong>
+      <div class="approval-board-intro">
+        <p><strong>Telah dipertahankan di depan Dewan Penguji<br>Fakultas ${escapeHtml(fakultasClean)}<br>Universitas Muhammadiyah Surakarta<br>Pada hari ${escapeHtml(identity.hariUjian || "…….")}, ${escapeHtml(identity.tanggalUjian || "………. 2023")}<br>dan dinyatakan telah memenuhi syarat</strong></p>
+      </div>
+      <p style="margin-top:14px;font-weight:bold;">Dewan Penguji:</p>
+      <div class="board-members">
+        <div class="board-row"><span>1. ${escapeHtml(identity.pembimbing || "Dr. Dosen Pembimbing, M.Sc.")}<br><small>(Ketua Dewan Penguji)</small></span><span>(……..……..)</span></div>
+        <div class="board-row"><span>2. ${escapeHtml(identity.penguji1 || "Dosen Penguji, S. Pd. M.Hum.")}<br><small>(Anggota I Dewan Penguji)</small></span><span>(……………)</span></div>
+        <div class="board-row"><span>3. ${escapeHtml(identity.penguji2 || "Dr. Dosen Penguji, M. Ed.")}<br><small>(Anggota II Dewan Penguji)</small></span><span>(…………….)</span></div>
+      </div>
+      <div class="board-officials">
+        <div class="official-col">
+          <p>Dekan<br>Fakultas ${escapeHtml(fakultasClean)}</p>
+          <div class="signature-space"></div>
+          <strong>${escapeHtml(identity.dekan || "Prof. Dr. Nama Lengkap")}</strong>
+          <span>NIDN. ${escapeHtml(identity.nidnDekan || "…")}</span>
+        </div>
+        <div class="official-col">
+          <p>Ketua Program Studi<br>${escapeHtml(prodiClean)}</p>
+          <div class="signature-space"></div>
+          <strong>${escapeHtml(identity.kaprodi || "Prof. Dr. Nama Lengkap")}</strong>
+          <span>NIDN. ${escapeHtml(identity.nidnKaprodi || "…")}</span>
+        </div>
+      </div>
     </article>
-    <article class="preview-page preview-content">${chaptersHTML}${references.length ? `<section class="preview-chapter"><h1>DAFTAR PUSTAKA</h1><ol>${references.map(reference => `<li>${escapeHtml(reference)}</li>`).join("")}</ol></section>` : ""}</article>`;
+
+    <!-- HALAMAN 4: PERNYATAAN -->
+    <article class="preview-page preview-approval">
+      <div class="preview-header-num">3</div>
+      <h1 class="doc-subheading" style="margin-bottom:30px;">PERNYATAAN</h1>
+      <p class="preview-body-p" style="text-indent:1.25cm;margin-bottom:14px;line-height:1.6;">Dengan ini saya menyatakan bahwa dalam skripsi ini tidak terdapat karya yang pernah diajukan untuk memperoleh gelar kesarjanaan di suatu perguruan tinggi dan sepanjang pengetahuan saya juga tidak terdapat karya atau pendapat yang pernah ditulis atau diterbitkan orang lain, kecuali secara tertulis diacu dalam naskah dan disebutkan dalam daftar pustaka.</p>
+      <p class="preview-body-p" style="text-indent:1.25cm;margin-bottom:40px;line-height:1.6;">Apabila kelak terbukti ada ketidakbenaran dalam pernyataan saya di atas, maka akan saya pertanggungjawabkan sepenuhnya.</p>
+      <div style="text-align:right;margin-top:60px;">
+        <p>Surakarta, …………….. ${escapeHtml(identity.tahun || "2023")}</p>
+        <p>Penulis</p>
+        <div class="signature-space" style="height:50px;"></div>
+        <strong style="text-decoration:underline;display:block;">${escapeHtml((identity.nama || "NAMA LENGKAP MAHASISWA").toUpperCase())}</strong>
+        <span><strong>${escapeHtml(identity.nim || "L20070000")}</strong></span>
+      </div>
+    </article>
+
+    <!-- HALAMAN 5: SURAT KETERANGAN LULUS PLAGIASI -->
+    <article class="preview-page preview-approval">
+      <div class="preview-header-num">4</div>
+      <h1 class="doc-subheading" style="text-decoration:underline;">SURAT KETERANGAN LULUS PLAGIASI</h1>
+      <p style="text-align:center;font-size:16px;margin-top:20px;">:</p>
+      <div class="plagiarism-placeholder" style="border:1px dashed var(--line);padding:24px;border-radius:8px;text-align:center;margin-top:40px;color:var(--muted);font-size:11px;">
+        [Lampiran hasil cek plagiasi / Turnitin / surat bebas plagiasi perpustakaan ditempel di bagian ini]
+      </div>
+    </article>
+
+    <!-- HALAMAN 6+: NASKAH PUBLIKASI ILMIAH -->
+    <article class="preview-page preview-content">
+      <div class="preview-header-num">1</div>
+      <div class="article-header">
+        <h1 class="article-title">${escapeHtml((identity.judul || "JUDUL NASKAH PUBLIKASI ILMIAH MAHASISWA").toUpperCase())}</h1>
+        <p class="article-author-info"><strong>${escapeHtml(identity.nama || "Nama Lengkap Mahasiswa")}</strong><br><span>${escapeHtml(identity.programStudi || "Program Studi Teknik Informatika")}, ${escapeHtml(identity.fakultas || "Fakultas Komunikasi dan Informatika")}, ${escapeHtml(identity.universitas || "Universitas Muhammadiyah Surakarta")}</span></p>
+      </div>
+
+      <div class="abstract-box">
+        <h3>Abstrak</h3>
+        <p class="abstract-text">${escapeHtml(abstract.indonesia || "")}</p>
+        <p class="abstract-keywords"><strong>Kata Kunci:</strong> ${escapeHtml(abstract.kataKunci || "")}</p>
+      </div>
+
+      <div class="abstract-box" style="margin-top:14px;">
+        <h3>Abstract</h3>
+        <p class="abstract-text" style="font-style:italic;">${escapeHtml(abstract.english || "")}</p>
+        <p class="abstract-keywords"><strong>Keywords:</strong> <em>${escapeHtml(abstract.keywords || "")}</em></p>
+      </div>
+
+      <hr class="article-divider" style="margin:24px 0;border:none;border-top:1px solid #ddd;">
+      ${chaptersHTML}
+
+      ${persantunanText ? `
+        <section class="preview-chapter">
+          <h1>PERSANTUNAN</h1>
+          <p class="preview-body-p" style="text-indent:0;">${escapeHtml(persantunanText)}</p>
+        </section>` : ""}
+
+      ${references.length ? `
+        <section class="preview-chapter">
+          <h1>DAFTAR PUSTAKA</h1>
+          <ul class="preview-references-list">${references.map(reference => `<li>${escapeHtml(reference)}</li>`).join("")}</ul>
+        </section>` : ""}
+    </article>`;
 }
 
 const previewBackdrop = document.getElementById("previewBackdrop");
 function openDocumentPreview() {
   saveData();
   renderDocumentPreview();
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    window.MathJax.typesetPromise([document.getElementById("docPreview")]).catch(() => {});
+  }
   previewBackdrop.classList.add("show");
   previewBackdrop.setAttribute("aria-hidden", "false");
   document.getElementById("closePreview").focus();

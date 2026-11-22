@@ -5,6 +5,7 @@ Sistem lokal sederhana:
 - Data disimpan otomatis di `localStorage`.
 - Tombol **Generate DOCX** mengirim data localStorage ke Python lokal.
 - Python membuat Word dengan A4, margin skripsi, Times New Roman 12, heading, cover UMS, nomor halaman, tabel, dan daftar isi.
+- Abstrak Bahasa Indonesia dan Abstract Bahasa Inggris dapat diedit pada bagian **Abstrak** dan dicetak sebelum bab Pendahuluan, masing-masing dengan kata kunci.
 
 ## Struktur
 
@@ -108,3 +109,35 @@ Jika Word menanyakan jenis pembaruan daftar isi, pilih **Perbarui seluruh tabel*
 - Dummy data + penyimpanan: `app.js`
 - Format Word: `generator.py`
 - Endpoint generator: `app.py`
+
+
+graph TD
+    A([Identify staffing need]) --> B[Define and write up job description]
+    B --> C[Send personnel request from to HR]
+    C --> D[Determine classification]
+    D --> E{Regular hire?}
+    E -- No --> F([Temp hiring process])
+    E -- Yes --> G[Post Job Internally]
+    G --> H{Suitable candidate?}
+    H -- Yes --> M[Arrange meeting with candidate]
+    H -- No --> I[Examine existing resumes on file]
+    I --> J{Suitable candidate?}
+    J -- Yes --> M
+    J -- No --> K[Develop recruitment strategy]
+    K --> L[Place ads]
+    L --> N[Gather resumes]
+    N --> O{Resume qualified?}
+    O -- No --> P([Rejection])
+    O -- Yes --> M
+    M --> Q[Conduct preliminary interview]
+    Q --> R[Develop interview questions]
+    R --> S[Conduct interview]
+    S --> T{References OK?}
+    T -- No --> P
+    T -- Yes --> U[Select candidate]
+    U --> V[Determine pay range]
+    V --> W[Make employment offer]
+    W --> X{Candidate accepts?}
+    X -- No --> P
+    X -- Yes --> Y([Hire candidate])
+    P --> N
