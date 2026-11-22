@@ -1,0 +1,557 @@
+{
+    "judul": "Pengembangan Platform Pembelajaran Adaptif Berbasis Web Menggunakan Prediksi LightGBM dan Retrieval-Augmented Generation (RAG) di SMAN 1 Kembangbahu",
+    "identitas": {
+        "oleh": "AMRUL HAQ AL-BINA’I",
+        "nim": "L200230279",
+        "program_studi": "PROGRAM STUDI TEKNIK INFORMATIKA",
+        "fakultas": "FAKULTAS KOMUNIKASI DAN INFORMATIKA",
+        "universitas": "UNIVERSITAS MUHAMMADIYAH SURAKARTA",
+        "tahun": 2026
+    },
+    "bab_1": {
+        "judul": "PENDAHULUAN",
+        "1.1_latar_belakang_masalah": [
+            "Penerapan kecerdasan buatan (Artificial Intelligence/AI) dalam pendidikan terus berkembang, tetapi dampaknya terhadap proses belajar dan hasil pembelajaran masih perlu dikaji dalam konteks penggunaan yang berbeda (Németh, 2025). Penelitian (Alotaibi, 2025), misalnya, mengembangkan platform pendukung keputusan berbasis web untuk memperkirakan kinerja akademik dan memberi saran akademik menggunakan model machine learning. Penelitian tersebut menunjukkan potensi analitik prediktif untuk mendukung keputusan akademik, tetapi belum mengintegrasikan prediksi risiko berbasis klasifikasi dengan rekomendasi modul yang dipetakan guru dan asisten tanya jawab yang dibatasi pada dokumen pembelajaran resmi. Untuk konteks SMAN 1 Kembangbahu, hasil wawancara awal menunjukkan bahwa tingkat pemahaman dan kecepatan belajar siswa beragam, di mana sebagian siswa membutuhkan pengulangan dan materi penguatan tambahan karena nilainya berada di bawah target capaian pembelajaran.",
+            "Salah satu pendekatan yang dapat digunakan untuk mendukung pemantauan tersebut adalah Educational Data Mining (EDM), yaitu pemanfaatan data pendidikan untuk menemukan pola dan mendukung pengambilan keputusan. (Abukader et al., 2025) mengkaji prediksi kinerja siswa menggunakan LightGBM yang dioptimalkan dan SHAP untuk membantu interpretasi hasil. (Alotaibi, 2025) juga menggunakan LightGBM untuk memprediksi nilai kinerja akademik kontinu dan mengevaluasi hasilnya dengan R², RMSE, dan MAE. Sementara itu, (Mustakim et al., 2025) membahas klasifikasi kinerja siswa serta membandingkan dampak reduksi dimensi PCA dan seleksi fitur RFE, sedangkan (Putra et al., 2026) membandingkan CatBoost dan LightGBM pada prediksi skor ujian. Temuan-temuan tersebut menjadi rujukan pemilihan dan evaluasi LightGBM, tetapi tidak serta-merta membuktikan kinerjanya pada skenario klasifikasi risiko yang digunakan dalam penelitian ini. Penelitian ini mendefinisikan siswa berisiko berdasarkan nilai pada periode target yang berada di bawah Kriteria Ketercapaian Tujuan Pembelajaran (KKTP) mata pelajaran. Model menggunakan riwayat nilai dari periode sebelumnya untuk memprediksi status biner periode berikutnya, dengan pemisahan data berdasarkan urutan waktu agar informasi dari periode target tidak masuk ke fitur prediksi. Kinerja model dievaluasi menggunakan Akurasi, Presisi, Recall, F1-Score, dan ROC-AUC.",
+            "Selain pemantauan kinerja akademik, siswa dapat memerlukan penjelasan tambahan yang sesuai dengan bahan ajar. Retrieval-Augmented Generation (RAG) menggabungkan pencarian informasi pada sumber eksternal dengan generasi jawaban oleh model bahasa, sehingga sumber yang disediakan pengajar dapat digunakan sebagai konteks jawaban. (Falaq et al., 2025) mengembangkan chatbot RAG untuk mendukung personalized learning dan melaporkan bahwa 15 dari 15 skenario uji black-box berhasil, dengan skor System Usability Scale (SUS) sebesar 74. (Németh, 2025) menunjukkan bahwa dosen dapat mengendalikan literatur yang menjadi dasar tutor AI, tetapi sebagian jawaban dalam studi mereka tetap berada di luar konteks yang diberikan. Tinjauan (Hajar et al., 2025; Li et al., 2025; Resika et al., 2026) juga menguraikan komponen RAG dan tantangan seperti ketepatan retrieval, integrasi sistem, evaluasi, serta potensi halusinasi. Karena itu, penelitian ini menggunakan RAG untuk tanya jawab berdasarkan PDF pembelajaran resmi yang diunggah guru, dengan Cosine Similarity sebagai salah satu indikator relevansi potongan dokumen. Pemeriksaan relevansi membantu memutuskan apakah konteks memadai, tetapi tidak menjamin seluruh jawaban benar atau bebas halusinasi.",
+            "Penelitian prediksi kinerja akademik dan penelitian RAG dalam pendidikan telah menyediakan dasar metode untuk masing-masing komponen. Namun, masih terdapat ruang untuk menguji integrasi keduanya dalam satu platform web yang menggunakan prediksi risiko sebagai dasar rekomendasi modul, sekaligus menyediakan tanya jawab yang diarahkan pada dokumen pembelajaran resmi. (Rani, 2026) mengkaji machine learning yang dapat dijelaskan untuk mendukung intervensi pembelajaran, sedangkan (Jumar et al., 2026) menguraikan rancangan asisten virtual pembelajaran berbasis RAG. (Adenuga, 2026) juga membahas risiko keluaran yang memuat informasi atau jejak internal sistem (trace leakage). Risiko tersebut tidak dapat diselesaikan hanya dengan Cosine Similarity; karena itu, pengendaliannya perlu didukung pembatasan hak akses, instruksi keluaran, dan pengujian terhadap pertanyaan yang berusaha meminta informasi internal. Celah penelitian ini diposisikan secara terbatas pada pengembangan dan evaluasi integrasi prediksi risiko, pemetaan modul oleh guru, dan asisten RAG pada konteks sekolah menengah, bukan sebagai klaim bahwa semua penelitian sebelumnya belum menggabungkan komponen tersebut.",
+            "Berdasarkan uraian tersebut, penelitian ini mengusulkan “Pengembangan Platform Pembelajaran Adaptif Berbasis Web Menggunakan Prediksi LightGBM dan Retrieval-Augmented Generation (RAG) di SMAN 1 Kembangbahu”. Platform menggunakan riwayat nilai tugas sebelum periode target untuk mengklasifikasikan risiko ketertinggalan akademik dengan LightGBM. Siswa yang ditandai berisiko memperoleh rekomendasi modul tambahan berdasarkan pemetaan mata pelajaran atau topik yang ditetapkan guru; rekomendasi tersebut merupakan bantuan belajar dan tidak menggantikan penilaian guru. Secara terpisah, siswa dapat menggunakan asisten tanya jawab berbasis RAG yang mengambil konteks dari buku teks atau modul PDF resmi yang diunggah guru. Jika hasil retrieval tidak memenuhi ambang relevansi atau dokumen tidak cukup mendukung jawaban, sistem dirancang untuk menyatakan keterbatasan informasi atau menolak pertanyaan. Kualitas prediksi, fungsi sistem, relevansi retrieval, kesesuaian jawaban dengan sumber, dan penolakan untuk pertanyaan di luar cakupan akan dievaluasi melalui pengujian yang sesuai."
+        ],
+        "1.2_rumusan_masalah": {
+            "pengantar": "Berdasarkan latar belakang masalah yang telah diuraikan, rumusan masalah dalam penelitian ini adalah:",
+            "daftar": [
+                "Bagaimana merancang dan mengimplementasikan LightGBM sebagai model klasifikasi biner untuk memprediksi risiko ketertinggalan akademik pada periode target berdasarkan riwayat nilai tugas pada periode sebelumnya?",
+                "Bagaimana membangun fitur tanya jawab berbasis Retrieval-Augmented Generation (RAG) dengan Google Gemini API dan Cosine Similarity agar jawaban diarahkan pada dokumen PDF resmi yang diunggah guru dan pertanyaan yang tidak didukung konteks dapat ditolak?",
+                "Bagaimana mengintegrasikan prediksi risiko LightGBM, pemetaan modul oleh guru, dan fitur tanya jawab RAG dalam satu platform pembelajaran adaptif berbasis web?",
+                "Bagaimana mengevaluasi fungsi sistem, relevansi hasil retrieval, kesesuaian jawaban RAG dengan dokumen sumber, dan ketepatan penolakan pertanyaan di luar cakupan melalui pengujian fungsional dan penilaian pakar?"
+            ]
+        },
+        "1.3_batasan_masalah": {
+            "pengantar": "Agar ruang lingkup penelitian ini tetap terarah dan fokus pada sasaran, maka ditetapkan batasan masalah sebagai berikut:",
+            "daftar": [
+                {
+                    "judul": "Lingkup platform dan implementasi",
+                    "isi": "Sistem berupa aplikasi perangkat lunak berbasis web untuk studi kasus di SMAN 1 Kembangbahu. Akses sistem bergantung pada ketersediaan server, koneksi internet, dan layanan API yang digunakan."
+                },
+                {
+                    "judul": "Batasan data prediksi",
+                    "isi": "Fitur model dibatasi pada riwayat nilai tugas akademik yang tersedia sebelum periode target. Label risiko dibentuk dari nilai pada periode target yang lebih rendah daripada KKTP mata pelajaran yang dikonfirmasi guru. Unit nilai target—misalnya nilai satu tugas berikutnya, rata-rata nilai tugas dalam satu periode, atau nilai akhir periode—ditetapkan setelah struktur data sekolah dikonfirmasi [PERLU DATA: tetapkan unit nilai target berdasarkan data yang tersedia]. Istilah KKTP/KKM dalam naskah harus disesuaikan dengan istilah resmi yang digunakan sekolah [PERLU DATA: konfirmasi istilah dan ketentuan ketuntasan di sekolah]."
+                },
+                {
+                    "judul": "Tindakan intervensi sistem",
+                    "isi": "Siswa yang diprediksi berisiko memperoleh rekomendasi modul atau materi tambahan berdasarkan pemetaan mata pelajaran/topik dan modul yang disusun atau disetujui guru. Sistem tidak menetapkan nilai akhir dan tidak secara otomatis menyimpulkan kelemahan pada topik tertentu jika pemetaan topik tidak tersedia."
+                },
+                {
+                    "judul": "Teknologi generative AI",
+                    "isi": "Fitur tanya jawab menggunakan Google Gemini API yang dipadukan dengan arsitektur Retrieval-Augmented Generation (RAG). Relevansi konteks dinilai dengan Cosine Similarity; hasilnya digunakan sebagai salah satu dasar untuk menjawab atau menolak pertanyaan, bukan sebagai bukti mutlak kebenaran jawaban."
+                },
+                {
+                    "judul": "Pembatasan basis pengetahuan",
+                    "isi": "Konteks sumber jawaban dibatasi pada buku teks atau modul pembelajaran berformat PDF yang diunggah dan disetujui guru. Sistem dirancang menolak atau meminta klarifikasi ketika dokumen yang ditemukan tidak memadai. Pembatasan sumber mengurangi ketergantungan pada pengetahuan bebas model, tetapi tidak menjamin halusinasi sepenuhnya hilang."
+                }
+            ]
+        },
+        "1.4_tujuan_penelitian": {
+            "pengantar": "Tujuan yang ingin dicapai dari penelitian tugas akhir ini adalah:",
+            "daftar": [
+                "Merancang dan mengimplementasikan LightGBM sebagai model klasifikasi biner untuk menghasilkan probabilitas risiko ketertinggalan akademik berdasarkan riwayat nilai sebelum periode target, kemudian mengevaluasi hasilnya menggunakan metrik klasifikasi yang telah ditetapkan.",
+                "Membangun fitur tanya jawab berbasis RAG menggunakan Google Gemini API dan Cosine Similarity, dengan sumber konteks dibatasi pada PDF resmi yang diunggah guru serta mekanisme penolakan ketika konteks tidak memadai.",
+                "Mengintegrasikan hasil prediksi LightGBM dengan rekomendasi modul yang dipetakan guru serta fitur tanya jawab RAG dalam satu platform pembelajaran adaptif berbasis web.",
+                "Mengevaluasi fungsi sistem melalui black-box testing serta mengevaluasi relevansi retrieval dan kualitas jawaban RAG melalui pertanyaan uji dan penilaian pakar guru, termasuk kesesuaian jawaban dengan sumber dan ketepatan penolakan pertanyaan di luar cakupan."
+            ]
+        },
+        "1.5_manfaat_penelitian": {
+            "pengantar": "Adapun manfaat yang diharapkan dari penelitian ini adalah sebagai berikut:",
+            "manfaat_bagi_siswa": [
+                {
+                    "judul": "Intervensi akademik dini",
+                    "isi": "Membantu siswa dan guru mengenali potensi risiko ketertinggalan berdasarkan riwayat nilai dan menyajikan rekomendasi modul tambahan sesuai pemetaan yang ditetapkan guru."
+                },
+                {
+                    "judul": "Pendampingan belajar mandiri",
+                    "isi": "Menyediakan fitur tanya jawab yang dapat diakses siswa kapan saja selama server, koneksi internet, dan layanan API tersedia. Jawaban diarahkan pada konteks PDF resmi yang diunggah guru, tetapi tetap perlu dievaluasi karena RAG tidak menjamin seluruh jawaban bebas dari kesalahan."
+                }
+            ],
+            "manfaat_bagi_guru_dan_pihak_sekolah": [
+                {
+                    "judul": "Efisiensi pemantauan",
+                    "isi": "Membantu guru meninjau riwayat nilai dan mengenali siswa yang mungkin membutuhkan dukungan lebih awal. Keputusan tindak lanjut tetap berada pada guru."
+                },
+                {
+                    "judul": "Dukungan pembelajaran digital",
+                    "isi": "Menyediakan sarana berbasis data untuk membantu guru mempertimbangkan tindak lanjut pembelajaran, bukan menggantikan pertimbangan pedagogis guru."
+                }
+            ],
+            "manfaat_bagi_pengembangan_ilmu_pengetahuan": [
+                {
+                    "judul": "Kontribusi pengembangan sistem",
+                    "isi": "Menghasilkan dan mengevaluasi prototipe yang mengintegrasikan prediksi risiko akademik dengan rekomendasi modul berbasis pemetaan guru serta pendampingan RAG pada satu platform web."
+                },
+                {
+                    "judul": "Evaluasi pengendalian keluaran AI",
+                    "isi": "Memberikan temuan empiris tentang relevansi retrieval, kesesuaian jawaban dengan PDF sumber, dan ketepatan penolakan pertanyaan di luar cakupan pada skenario uji yang ditetapkan. Cosine Similarity tidak diperlakukan sebagai mekanisme tunggal untuk mencegah trace leakage atau menjamin tidak adanya halusinasi."
+                }
+            ]
+        }
+    },
+    "bab_2": {
+        "judul": "TINJAUAN PUSTAKA DAN DASAR TEORI",
+        "2.1_studi_literatur_dan_penelitian_terkait": {
+            "2.1.1_prediksi_kinerja_akademik": "Educational Data Mining (EDM) dapat digunakan untuk membangun sistem peringatan dini yang membantu identifikasi siswa yang membutuhkan intervensi (Abukader et al., 2025). (Abukader et al., 2025) mengkaji LightGBM yang dioptimalkan dan interpretasi SHAP untuk prediksi kinerja akademik; (Alotaibi, 2025) menerapkan LightGBM untuk prediksi nilai kontinu; (Mustakim et al., 2025) menelaah klasifikasi kinerja siswa serta membandingkan PCA dan RFE; sedangkan (Putra et al., 2026) membandingkan CatBoost dan LightGBM dalam prediksi skor ujian. Penelitian-penelitian tersebut menjadi rujukan untuk memilih model dan merancang evaluasi, tetapi tugas prediksinya tidak seluruhnya sama dengan penelitian ini. Model yang diusulkan melakukan klasifikasi biner: status berisiko jika nilai pada periode target berada di bawah KKTP, dan tidak berisiko jika nilai mencapai atau melampaui KKTP. Riwayat nilai yang digunakan sebagai fitur harus berasal dari periode sebelum target. Evaluasi akan menggunakan Akurasi, Presisi, Recall, F1-Score, dan ROC-AUC. (Rani, 2026) juga membahas penggunaan SHAP untuk membantu penafsiran model dan mendukung intervensi pembelajaran.",
+            "2.1.2_penerapan_rag_dalam_pendidikan": "Perkembangan large language models (LLM) mendorong pengembangan asisten pembelajaran yang dapat menjawab pertanyaan berdasarkan materi tertentu. (Falaq et al., 2025) mengembangkan chatbot RAG untuk mendukung personalized learning; penelitian itu melaporkan 15 dari 15 skenario black-box berhasil dan skor SUS sebesar 74. (Németh, 2025) menunjukkan bahwa RAG memungkinkan pengajar mengendalikan literatur yang digunakan tutor AI, sekaligus mencatat bahwa sebagian jawaban dapat berada di luar konteks sumber. (Resika et al., 2026) meninjau implementasi RAG dalam pendidikan dan menekankan perlunya optimasi retrieval serta evaluasi yang lebih luas. (Jumar et al., 2026) merumuskan rancangan asisten virtual berbasis RAG, sementara (Hajar et al., 2025) membahas tantangan efektivitas retriever, kompleksitas integrasi, dan evaluasi. (Adenuga, 2026) mengidentifikasi pula risiko keluaran yang mengungkap informasi atau jejak internal sistem. Literatur tersebut mendasari penggunaan RAG, namun sistem yang dikembangkan tetap perlu menguji relevansi potongan yang ditemukan, kesesuaian jawaban dengan sumber, penolakan pertanyaan di luar cakupan, serta penanganan permintaan informasi internal.",
+            "2.1.3_sintesis_penelitian_terdahulu": "Penelitian terdahulu yang dirujuk pada naskah ini memiliki fokus berbeda: sebagian meneliti prediksi kinerja akademik, sedangkan sebagian lain mengembangkan asisten pembelajaran berbasis RAG. Penelitian ini mengintegrasikan kedua fungsi tersebut tanpa menyamakan perannya. LightGBM mengestimasi risiko berdasarkan riwayat nilai; rekomendasi modul ditentukan melalui pemetaan yang disusun atau disetujui guru; dan RAG mendukung tanya jawab dengan konteks PDF resmi. Ketiga komponen akan diuji sesuai karakteristiknya masing-masing."
+        },
+        "2.2_perbandingan_penelitian_terdahulu_dan_celah_riset": {
+            "pengantar": "Tabel 2.1 membandingkan fokus metode dan bentuk tindak lanjut pada beberapa penelitian yang dirujuk dengan sistem yang diusulkan. Perbandingan ini digunakan untuk memetakan ruang lingkup penelitian, bukan untuk menyimpulkan bahwa seluruh penelitian terdahulu tidak memiliki fitur intervensi.",
+            "tabel_2_1": {
+                "judul": "Perbandingan Penelitian Terdahulu dan Celah Riset",
+                "kolom": [
+                    "Aspek",
+                    "(Falaq et al., 2025)",
+                    "(Abukader et al., 2025; Alotaibi, 2025)",
+                    "Penelitian yang Diusulkan"
+                ],
+                "baris": [
+                    {
+                        "aspek": "Fokus",
+                        "falaq": "Chatbot RAG untuk mendukung personalized learning.",
+                        "abukader_alotaibi": "Prediksi kinerja akademik dan dukungan keputusan berbasis machine learning.",
+                        "penelitian_diusulkan": "Platform web yang mengintegrasikan prediksi risiko, rekomendasi modul, dan pendampingan RAG."
+                    },
+                    {
+                        "aspek": "Metode",
+                        "falaq": "RAG chatbot dengan metode Design Thinking.",
+                        "abukader_alotaibi": "LightGBM; studi terkait menggunakan pendekatan dan metrik prediksi yang berbeda.",
+                        "penelitian_diusulkan": "Klasifikasi biner LightGBM dan RAG dengan Google Gemini API."
+                    },
+                    {
+                        "aspek": "Data/Referensi",
+                        "falaq": "Basis pengetahuan untuk pendampingan belajar.",
+                        "abukader_alotaibi": "Data kinerja akademik untuk pemodelan prediksi.",
+                        "penelitian_diusulkan": "Riwayat nilai tugas siswa dan PDF resmi yang diunggah guru."
+                    },
+                    {
+                        "aspek": "Tindak Lanjut",
+                        "falaq": "Tanya jawab dan dukungan belajar mandiri.",
+                        "abukader_alotaibi": "Prediksi kinerja akademik dan saran/dukungan akademik sesuai cakupan masing-masing studi.",
+                        "penelitian_diusulkan": "Siswa berisiko mendapat rekomendasi modul berdasarkan pemetaan guru; RAG menjawab berdasarkan konteks PDF."
+                    }
+                ]
+            },
+            "celah_penelitian": "Celah penelitian yang dituju adalah pengembangan dan evaluasi satu platform web yang menggabungkan klasifikasi risiko akademik berbasis riwayat nilai, rekomendasi modul berdasarkan pemetaan guru, serta asisten RAG berbasis dokumen PDF resmi. Kontribusi akan dinilai dari implementasi dan hasil pengujian komponen tersebut. Cosine Similarity digunakan untuk menilai kemiripan semantik antara kueri dan potongan dokumen, bukan sebagai jaminan bahwa jawaban benar atau sebagai satu-satunya perlindungan terhadap trace leakage."
+        },
+        "2.3_landasan_teori": {
+            "2.3.1_arsitektur_sistem_informasi_akademik_berbasis_web": "Sistem informasi akademik berbasis web dapat digunakan untuk mengelola dan menyajikan data pendidikan melalui peramban (Sulistyo et al., 2022). Pada penelitian ini, aplikasi web menjadi media integrasi pengelolaan riwayat nilai, tampilan hasil prediksi, rekomendasi modul, pengelolaan PDF pembelajaran, dan asisten tanya jawab. Secara konseptual, antarmuka pengguna berkomunikasi dengan backend melalui layanan aplikasi; backend mengatur autentikasi, hak akses, validasi data, pemanggilan model LightGBM, proses retrieval, penyimpanan, dan penyajian respons. Hak akses dibedakan bagi guru/admin dan siswa.",
+            "2.3.2_algoritma_lightgbm_untuk_prediksi_risiko_akademik": "Light Gradient Boosting Machine (LightGBM) merupakan algoritma berbasis gradient boosting decision trees yang dapat digunakan untuk tugas prediksi. Efisiensi pelatihan dan penggunaan memori menjadi salah satu alasan LightGBM diteliti dalam konteks data akademik (Abukader et al., 2025; Alotaibi, 2025). Algoritma ini antara lain menggunakan strategi pertumbuhan pohon secara leaf-wise dan teknik Gradient-based One-Side Sampling (GOSS). Dalam penelitian ini, LightGBM digunakan sebagai klasifikator biner, bukan sebagai model regresi nilai kontinu. Label risiko dibentuk berdasarkan nilai aktual pada periode target yang dibandingkan dengan KKTP. Probabilitas keluaran model digunakan untuk membantu menentukan status risiko berdasarkan ambang klasifikasi yang ditetapkan melalui validasi data dan dibahas bersama guru.",
+            "2.3.3_arsitektur_rag_dan_cosine_similarity": {
+                "uraian": "Retrieval-Augmented Generation (RAG) menggabungkan pengambilan informasi dari basis pengetahuan eksternal dengan generasi jawaban oleh model bahasa. Pada sistem ini, PDF yang diunggah guru diekstrak menjadi teks, dibagi menjadi potongan (chunk), diubah menjadi vektor embedding, dan disimpan bersama metadata. Pertanyaan siswa juga diubah menjadi embedding untuk mencari potongan yang paling relevan. Potongan terpilih menjadi konteks bagi Google Gemini API. Jika skor relevansi berada di bawah ambang atau konteks tidak cukup menjawab pertanyaan, sistem memberi tahu pengguna bahwa informasi belum ditemukan atau menolak menjawab. Pendekatan ini mengarahkan jawaban pada sumber yang ditetapkan, tetapi tidak menjamin keluaran selalu benar (Falaq et al., 2025; Li et al., 2025; Németh, 2025; Resika et al., 2026).",
+                "rumus_cosine_similarity": "Cosine Similarity(A, B) = (A · B) / (‖A‖ × ‖B‖)",
+                "penjelasan_rumus": "Cosine Similarity mengukur kemiripan arah antara dua vektor, misalnya embedding pertanyaan dan embedding potongan dokumen. Nilai tersebut dipakai untuk mengurutkan atau memeriksa relevansi potongan, bukan untuk menilai kebenaran faktual jawaban dan bukan untuk mencegah trace leakage secara langsung. Ambang ditentukan melalui pertanyaan kalibrasi dan dievaluasi menggunakan kumpulan pertanyaan uji yang terpisah bila data memungkinkan."
+            },
+            "2.3.4_pembelajaran_adaptif": "Pembelajaran adaptif menyesuaikan dukungan belajar dengan kebutuhan siswa. Pada platform ini, mekanisme adaptasi diwujudkan melalui rekomendasi modul tambahan bagi siswa yang diprediksi berisiko, dengan kesesuaian modul ditentukan melalui pemetaan mata pelajaran atau topik yang disusun atau disetujui guru. Jika pemetaan topik tidak tersedia, rekomendasi dibatasi pada modul atau kelompok materi yang dapat dipastikan keterkaitannya. Fitur tanya jawab RAG tersedia sebagai sarana pendampingan berdasarkan PDF resmi; fungsi ini berbeda dari model prediksi dan tidak menentukan status risiko siswa."
+        },
+        "2.4_kerangka_berpikir": [
+            {
+                "tahap": 1,
+                "judul": "Input data",
+                "uraian": "Mengumpulkan riwayat nilai tugas dengan urutan periode dan dokumen PDF pembelajaran resmi yang disetujui guru."
+            },
+            {
+                "tahap": 2,
+                "judul": "Pemrosesan machine learning",
+                "uraian": "Menggunakan riwayat nilai sebelum periode target untuk melatih dan menjalankan LightGBM, lalu menghasilkan probabilitas dan status risiko berdasarkan label serta ambang yang telah ditentukan."
+            },
+            {
+                "tahap": 3,
+                "judul": "Intervensi pembelajaran",
+                "uraian": "Siswa berisiko menerima rekomendasi modul berdasarkan pemetaan guru. Fitur RAG melayani pertanyaan siswa dengan konteks hasil retrieval dari PDF; jika konteks tidak memadai, sistem menolak atau meminta klarifikasi. Perlindungan atas informasi internal ditangani melalui hak akses dan pengujian keamanan, bukan hanya melalui Cosine Similarity."
+            },
+            {
+                "tahap": 4,
+                "judul": "Evaluasi",
+                "uraian": "Mengukur kinerja klasifikasi LightGBM, keberhasilan fungsi melalui black-box testing, relevansi retrieval, kesesuaian jawaban RAG dengan sumber, serta ketepatan penolakan pertanyaan di luar cakupan."
+            }
+        ]
+    },
+    "bab_3": {
+        "judul": "METODOLOGI PENELITIAN",
+        "pengantar": "Penelitian ini merupakan penelitian terapan dengan pendekatan rekayasa perangkat lunak untuk mengembangkan platform pembelajaran adaptif berbasis web. Platform mengintegrasikan prediksi risiko ketertinggalan akademik menggunakan Light Gradient Boosting Machine (LightGBM), rekomendasi modul pembelajaran, dan asisten tanya jawab berbasis Retrieval-Augmented Generation (RAG) dengan Google Gemini API. Data kualitatif digunakan untuk memahami proses pembelajaran dan kebutuhan pengguna, sedangkan data kuantitatif digunakan untuk mengevaluasi model prediksi dan hasil pengujian sistem.",
+        "3.1_metode_pengembangan_sistem": {
+            "metode": "Prototyping",
+            "alasan": "Metode yang digunakan adalah prototyping karena platform melayani beberapa jenis pengguna dan menggabungkan fungsi akademik dengan layanan AI, sehingga antarmuka, alur kerja guru, bentuk rekomendasi, dan mekanisme pembatasan jawaban perlu diperiksa melalui umpan balik pengguna.",
+            "referensi": "(Tsani, n.d.) menjelaskan bahwa prototyping membuat model awal yang dievaluasi bersama pengguna lalu disempurnakan berdasarkan masukan.",
+            "tahapan": [
+                {
+                    "tahap": 1,
+                    "nama": "Komunikasi kebutuhan",
+                    "kegiatan": "Observasi, wawancara guru, dan pemeriksaan dokumen untuk mengidentifikasi proses pemantauan nilai, kebutuhan rekomendasi modul, bentuk materi PDF, dan batasan asisten AI"
+                },
+                {
+                    "tahap": 2,
+                    "nama": "Perencanaan cepat",
+                    "kegiatan": "Menetapkan ruang lingkup fungsi, jenis pengguna, data, prioritas fitur, dan skenario pengujian"
+                },
+                {
+                    "tahap": 3,
+                    "nama": "Perancangan awal",
+                    "kegiatan": "Menyusun use case, basis data, antarmuka, alur LightGBM, serta alur retrieval dan generation RAG"
+                },
+                {
+                    "tahap": 4,
+                    "nama": "Pembangunan prototipe",
+                    "kegiatan": "Membangun bertahap: autentikasi, pengelolaan nilai, prediksi dan rekomendasi, unggah PDF, tanya jawab RAG"
+                },
+                {
+                    "tahap": 5,
+                    "nama": "Evaluasi dan umpan balik",
+                    "kegiatan": "Guru dan pengguna terpilih memeriksa prototipe, menjalankan skenario uji, dan perbaikan dilakukan sebelum pengujian akhir"
+                }
+            ],
+            "penutup": "Siklus dapat diulang jika masih ada kebutuhan yang belum terpenuhi atau pengujian menemukan kesalahan. Evaluasi berupa penyerahan prototipe kepada pengguna yang terlibat, bukan penerapan publik."
+        },
+        "3.2_teknik_pengumpulan_data": {
+            "3.2.1_lokasi_dan_waktu": "Penelitian dilaksanakan di SMAN 1 Kembangbahu, Kabupaten Lamongan, Jawa Timur, sesuai studi kasus pada Bab I, berkoordinasi dengan pihak sekolah dan guru mata pelajaran. Waktu penelitian: [PERLU DATA: bulan dan tahun mulai serta selesai].",
+            "3.2.2_populasi_sampel_dan_unit_analisis": {
+                "populasi": "Populasi adalah siswa pada kelas dan mata pelajaran yang ditetapkan bersama sekolah serta memiliki riwayat nilai tugas pada periode yang tersedia [PERLU DATA: jumlah siswa, kelas, mata pelajaran, dan periode].",
+                "teknik_sampling": "Sampel dipilih dengan purposive sampling berdasarkan kelayakan data: nilai pada periode yang diperlukan tersedia, siswa dan mata pelajaran dapat dihubungkan secara konsisten melalui kode anonim, dan label risiko dapat disusun berdasarkan KKTP yang dikonfirmasi guru.",
+                "penanganan_data": "Catatan yang tidak memenuhi kriteria ditandai untuk diperiksa, bukan dihapus tanpa alasan.",
+                "unit_analisis_model": "Rangkaian nilai tugas siswa pada satu mata pelajaran yang digunakan untuk memprediksi status pada periode berikutnya.",
+                "unit_analisis_rag": "PDF pembelajaran resmi yang diunggah guru.",
+                "penilai": "Penilai jawaban adalah guru mata pelajaran [PERLU DATA: jumlah dan kriteria guru penilai]."
+            },
+            "3.2.3_teknik_pengumpulan_data": [
+                {
+                    "teknik": "Observasi",
+                    "uraian": "Mengamati pencatatan nilai, penggunaan materi, dan tindak lanjut guru, dicatat dalam lembar pengamatan tanpa mengubah proses pembelajaran."
+                },
+                {
+                    "teknik": "Wawancara semi-terstruktur",
+                    "uraian": "Kepada guru atau pihak berwenang mengenai indikator siswa yang perlu dukungan, aturan tindak lanjut, bentuk modul, hak akses, dan kriteria jawaban asisten yang dapat diterima."
+                },
+                {
+                    "teknik": "Dokumentasi",
+                    "uraian": "Mengumpulkan riwayat nilai tugas dan PDF resmi sesuai izin sekolah dan prinsip minimisasi data."
+                },
+                {
+                    "teknik": "Studi pustaka",
+                    "uraian": "Menelaah literatur tentang prototyping, prediksi kinerja akademik dengan LightGBM, evaluasi model, RAG dalam pendidikan, dan pengujian perangkat lunak. (Abukader et al., 2025) dijadikan acuan pengembangan model LightGBM untuk prediksi performa siswa, sedangkan (Li et al., 2025) merangkum komponen dan tantangan RAG dalam pendidikan."
+                }
+            ],
+            "3.2.4_definisi_operasional": {
+                "judul_tabel": "Definisi operasional variabel, komponen sistem, dan indikator pengujian",
+                "kolom": [
+                    "Istilah",
+                    "Definisi operasional",
+                    "Indikator"
+                ],
+                "baris": [
+                    {
+                        "istilah": "Riwayat nilai tugas",
+                        "definisi_operasional": "Kumpulan nilai siswa pada beberapa tugas dalam satu mata pelajaran dan rentang waktu, dengan informasi periode",
+                        "indikator": "Kelengkapan, konsistensi skala, urutan waktu"
+                    },
+                    {
+                        "istilah": "Risiko ketertinggalan (LightGBM)",
+                        "definisi_operasional": "Probabilitas 0,0–1,0 bahwa nilai siswa pada periode target berada di bawah KKTP mata pelajaran. Label biner: 1 (berisiko) jika nilai target < KKTP; 0 (tidak berisiko) jika nilai target ≥ KKTP. Fitur hanya berasal dari periode sebelum target.",
+                        "indikator": "Akurasi, Presisi, Recall, F1-Score, ROC-AUC; KKTP serta ambang probabilitas ditetapkan melalui validasi dan dikonfirmasi guru."
+                    },
+                    {
+                        "istilah": "Rekomendasi modul",
+                        "definisi_operasional": "Modul tambahan untuk siswa berisiko berdasarkan pemetaan mata pelajaran/topik yang disusun atau disetujui guru.",
+                        "indikator": "Kesesuaian status risiko dengan modul; pemeriksaan guru"
+                    },
+                    {
+                        "istilah": "Basis pengetahuan RAG",
+                        "definisi_operasional": "PDF buku teks atau modul resmi yang disetujui dan diunggah guru",
+                        "indikator": "Asal, mata pelajaran, versi, persetujuan guru"
+                    },
+                    {
+                        "istilah": "Skor relevansi retrieval",
+                        "definisi_operasional": "Kemiripan vektor pertanyaan dengan vektor potongan dokumen untuk mengurutkan/menilai relevansi konteks, bukan untuk memastikan kebenaran jawaban.",
+                        "indikator": "Skor Cosine Similarity, keberadaan chunk relevan dalam hasil retrieval teratas, dan ambang dari pertanyaan kalibrasi."
+                    },
+                    {
+                        "istilah": "Kualitas jawaban RAG",
+                        "definisi_operasional": "Kesesuaian jawaban dengan pertanyaan dan dokumen rujukan, termasuk kecukupan jawaban serta ketepatan menolak pertanyaan di luar dokumen.",
+                        "indikator": "Rubrik guru pada pertanyaan uji"
+                    },
+                    {
+                        "istilah": "Fungsi sistem web",
+                        "definisi_operasional": "Kesesuaian fungsi dengan kebutuhan yang ditetapkan",
+                        "indikator": "Hasil aktual vs. harapan pada black-box"
+                    }
+                ]
+            }
+        },
+        "3.3_analisis_kebutuhan_sistem": {
+            "3.3.1_kebutuhan_fungsional": {
+                "pengantar": "Kebutuhan fungsional dirumuskan berdasarkan peran guru/admin dan siswa, serta alur prediksi dan RAG yang dipisahkan secara konseptual.",
+                "daftar": [
+                    {
+                        "kode": "F-01",
+                        "aktor": "Guru/admin, siswa",
+                        "kebutuhan": "Autentikasi dan hak akses sesuai peran"
+                    },
+                    {
+                        "kode": "F-02",
+                        "aktor": "Guru/admin",
+                        "kebutuhan": "Memasukkan/mengimpor riwayat nilai tugas dan memeriksa hasil validasi data"
+                    },
+                    {
+                        "kode": "F-03",
+                        "aktor": "Guru/admin",
+                        "kebutuhan": "Meninjau hasil prediksi dan mengelola pemetaan status risiko ke modul tambahan yang sesuai."
+                    },
+                    {
+                        "kode": "F-04",
+                        "aktor": "Guru",
+                        "kebutuhan": "Mengunggah, memeriksa, memperbarui, dan menghapus PDF pembelajaran resmi"
+                    },
+                    {
+                        "kode": "F-05",
+                        "aktor": "Sistem",
+                        "kebutuhan": "Memproses PDF menjadi teks, chunk, embedding, dan indeks retrieval"
+                    },
+                    {
+                        "kode": "F-06",
+                        "aktor": "Sistem/siswa",
+                        "kebutuhan": "Menampilkan rekomendasi modul untuk siswa berisiko berdasarkan pemetaan guru; siswa hanya dapat melihat data miliknya."
+                    },
+                    {
+                        "kode": "F-07",
+                        "aktor": "Siswa/sistem",
+                        "kebutuhan": "Siswa bertanya kepada asisten RAG; sistem mengambil konteks PDF, memeriksa relevansi, lalu menjawab berdasarkan konteks atau menolak/meminta klarifikasi bila konteks tidak memadai."
+                    },
+                    {
+                        "kode": "F-08",
+                        "aktor": "Sistem/guru",
+                        "kebutuhan": "Menyimpan hasil prediksi, rekomendasi, metadata dokumen, dan catatan uji; guru dapat meninjau keluaran tanpa sistem menetapkan nilai akhir."
+                    }
+                ]
+            },
+            "3.3.2_kebutuhan_nonfungsional": [
+                {
+                    "kategori": "Keamanan dan privasi",
+                    "uraian": "Akses data dibatasi per peran, identitas dianonimkan pada dataset analisis, dan data diproses sesuai izin sekolah."
+                },
+                {
+                    "kategori": "Keterlacakan",
+                    "uraian": "Versi data, model, PDF, ambang Cosine Similarity, dan skenario uji dicatat."
+                },
+                {
+                    "kategori": "Keandalan jawaban",
+                    "uraian": "Asisten diminta menggunakan konteks retrieval dan menolak pertanyaan yang tidak didukung dokumen. Untuk mengurangi risiko pengungkapan informasi internal, sistem membatasi hak akses dan tidak menampilkan instruksi internal, metadata yang tidak perlu, maupun label internal retrieval kepada siswa; perlindungan tersebut tetap perlu diuji dan tidak dianggap sempurna."
+                },
+                {
+                    "kategori": "Kemudahan penggunaan",
+                    "uraian": "Antarmuka dan pesan kesalahan jelas bagi guru dan siswa."
+                },
+                {
+                    "kategori": "Kinerja",
+                    "uraian": "Waktu prediksi, retrieval, dan jawaban API dicatat pada skenario uji."
+                },
+                {
+                    "kategori": "Pemeliharaan",
+                    "uraian": "Komponen dipisahkan secara logis agar mudah diperbaiki."
+                }
+            ],
+            "3.3.3_kebutuhan_data_dan_instrumen": {
+                "data": [
+                    "Rekaman nilai tugas berurutan per siswa, mata pelajaran, dan periode.",
+                    "KKTP dan kriteria risiko yang dikonfirmasi guru.",
+                    "PDF resmi sebagai basis pengetahuan.",
+                    "Pemetaan modul terhadap mata pelajaran/topik.",
+                    "Daftar pertanyaan uji dengan rujukan jawaban."
+                ],
+                "instrumen": [
+                    "Pedoman observasi dan wawancara.",
+                    "Lembar inventarisasi data.",
+                    "Skenario black-box.",
+                    "Lembar pencatatan metrik LightGBM.",
+                    "Lembar pemeriksaan relevansi retrieval.",
+                    "Rubrik penilaian pakar."
+                ],
+                "validasi_instrumen": "Instrumen pertanyaan dan rubrik diperiksa pembimbing dan/atau guru sebelum digunakan."
+            }
+        },
+        "3.4_perancangan_sistem": {
+            "3.4.1_arsitektur_sistem": {
+                "uraian": "Arsitektur konseptual terdiri atas antarmuka web, backend, basis data, layanan prediksi LightGBM, dan komponen RAG yang terhubung dengan Google Gemini API. Sistem informasi akademik berbasis web telah dikembangkan untuk mendukung pengelolaan data akademik (Sulistyo et al., 2022). Pada sistem ini, backend mengatur autentikasi, hak akses, validasi input, pemanggilan model, retrieval, penyimpanan hasil, dan penyajian respons. Guru/admin mengelola data, PDF, pemetaan modul, serta meninjau prediksi; siswa hanya mengakses informasi miliknya, melihat rekomendasi, dan menggunakan fitur tanya jawab.",
+                "gambar": {
+                    "nomor": "Gambar 3.1",
+                    "judul": "Alur Utama Platform Pembelajaran Adaptif",
+                    "keterangan": "Kedua alur diintegrasikan melalui aplikasi web, tetapi dievaluasi secara terpisah karena keberhasilan model prediksi tidak membuktikan kualitas jawaban RAG, dan sebaliknya."
+                }
+            },
+            "3.4.2_pemrosesan_data_dan_model_lightgbm": "Data diperiksa dari sisi kelengkapan, konsistensi skala, duplikasi, urutan periode, dan nilai yang tidak wajar; nilai ekstrem diverifikasi dengan guru sebelum diputuskan sebagai kesalahan. Fitur hanya diambil dari informasi sebelum periode target untuk mencegah kebocoran data (data leakage). LightGBM dibangun sebagai klasifikasi biner: label 1 (berisiko) jika nilai aktual pada periode target di bawah KKTP dan label 0 (tidak berisiko) jika nilai mencapai atau melampaui KKTP. [PERLU DATA: tetapkan apakah nilai target berupa nilai satu tugas berikutnya, rata-rata tugas pada satu periode, atau nilai akhir periode berdasarkan struktur data sekolah]. Keluaran model berupa probabilitas risiko 0,0–1,0. Pembagian data mengikuti urutan waktu: periode lebih awal untuk pelatihan, periode berikutnya untuk validasi dan/atau pengujian sesuai ketersediaan data. Penyetelan hiperparameter dan pemilihan ambang probabilitas dilakukan tanpa menggunakan hasil pada data uji akhir. Jika kelas berisiko menjadi minoritas, penanganan ketidakseimbangan hanya diterapkan pada data latih. Pembersihan data, pemisahan data, pencegahan data leakage, dan penyetelan hiperparameter mengacu pada praktik yang dibahas (Abukader et al., 2025). KKTP serta ambang probabilitas untuk status risiko ditetapkan bersama guru dan dicatat sebelum pengujian akhir.",
+            "3.4.3_pipeline_rag": "Setelah guru mengunggah PDF, sistem mengekstrak teks, membaginya menjadi chunk, membentuk embedding, dan menyimpannya bersama metadata. Pertanyaan siswa diubah menjadi embedding dan dibandingkan dengan embedding chunk menggunakan Cosine Similarity. Sistem mengambil sejumlah chunk teratas dan memeriksa skor relevansinya terhadap ambang yang telah dikalibrasi. Jika konteks dinilai memadai, chunk yang relevan dikirim kepada Gemini API bersama instruksi agar jawaban dibatasi pada konteks tersebut. Jika tidak, sistem menyatakan bahwa dokumen yang tersedia belum cukup menjawab pertanyaan atau meminta siswa memperjelas pertanyaan. Sistem tidak mengandalkan Cosine Similarity saja untuk mencegah pengungkapan instruksi internal; pembatasan hak akses dan pengujian pertanyaan adversarial menjadi bagian dari pengendalian terpisah. (Li et al., 2025) membahas retrieval, generation, pengelolaan sumber, serta tantangan mitigasi halusinasi dalam RAG pendidikan. Ambang Cosine Similarity, ukuran chunk, overlap, model embedding, dan jumlah chunk diuji menggunakan pertanyaan kalibrasi yang meliputi pertanyaan terjawab, ambigu, dan di luar cakupan, lalu ditetapkan sebelum pengujian akhir."
+        },
+        "3.5_pengujian_sistem": {
+            "pengantar": "Pengujian dipisah menjadi pengujian fungsional, evaluasi LightGBM, dan evaluasi RAG, karena berfungsinya aplikasi tidak membuktikan akurasi model atau ketepatan jawaban AI.",
+            "3.5.1_black_box_testing": {
+                "definisi": "Black-box testing memeriksa keluaran sistem terhadap masukan tanpa menilai implementasi internal. Setiap kasus uji memuat prasyarat, masukan, langkah, hasil diharapkan, hasil aktual, dan status lulus/gagal. Pendekatan ini juga dilaporkan oleh (Mutezar & Salamah, 2021) untuk memeriksa kesesuaian fungsi terhadap kebutuhan.",
+                "area_uji": [
+                    {
+                        "area": "Autentikasi dan hak akses",
+                        "contoh_skenario": "Login valid/tidak valid; siswa membuka data orang lain",
+                        "kriteria_keberhasilan": "Akses sesuai peran; akses tidak valid ditolak"
+                    },
+                    {
+                        "area": "Pengelolaan nilai dan PDF",
+                        "contoh_skenario": "Data/berkas valid, kosong, format salah, duplikat, PDF tidak dapat diekstrak",
+                        "kriteria_keberhasilan": "Data valid diproses; kesalahan ditandai dengan pesan jelas"
+                    },
+                    {
+                        "area": "Prediksi dan rekomendasi",
+                        "contoh_skenario": "Prediksi pada data layak",
+                        "kriteria_keberhasilan": "Keluaran model dan rekomendasi sesuai aturan terkonfigurasi"
+                    },
+                    {
+                        "area": "Tanya jawab RAG",
+                        "contoh_skenario": "Pertanyaan terjawab di PDF, di luar cakupan, tanpa konteks",
+                        "kriteria_keberhasilan": "Jawaban bersandar pada konteks; di luar cakupan ditolak"
+                    },
+                    {
+                        "area": "Ketahanan input",
+                        "contoh_skenario": "Pertanyaan kosong, sangat panjang, atau meminta instruksi internal",
+                        "kriteria_keberhasilan": "Ditangani aman; informasi internal tidak tampil"
+                    }
+                ],
+                "rumus_persentase_keberhasilan": "(jumlah kasus uji lulus / jumlah seluruh kasus uji) × 100%",
+                "pelaporan": "Dilaporkan juga per fitur."
+            },
+            "3.5.2_evaluasi_lightgbm": {
+                "uraian": "Evaluasi dilakukan pada data uji menggunakan confusion matrix (TP, TN, FP, FN) dan metrik berikut:",
+                "rumus": {
+                    "akurasi": "(TP + TN) / (TP + TN + FP + FN)",
+                    "presisi": "TP / (TP + FP)",
+                    "recall": "TP / (TP + FN)",
+                    "f1_score": "2 × (Presisi × Recall) / (Presisi + Recall)",
+                    "roc_auc": "ROC-AUC dihitung dari kurva ROC berdasarkan probabilitas keluaran model."
+                },
+                "interpretasi": "Jika kelas berisiko merupakan kelas minoritas, akurasi saja dapat menyesatkan sehingga Recall, F1-Score, dan ROC-AUC perlu ditafsirkan bersama. Hasil ditafsirkan sesuai ukuran dan karakteristik data; model berfungsi sebagai pendukung keputusan guru, bukan penentu tunggal."
+            },
+            "3.5.3_evaluasi_retrieval_dan_jawaban_rag": {
+                "rancangan": "Pertanyaan uji disusun dari PDF bersama guru dan mencakup pertanyaan yang dapat dijawab langsung, memerlukan penggabungan informasi, ambigu, di luar dokumen, serta yang meminta informasi internal. Jumlah pertanyaan dan jumlah guru penilai ditetapkan sebelum pengujian [PERLU DATA: jumlah pertanyaan uji dan jumlah penilai].",
+                "data_yang_dicatat": [
+                    "Potongan yang relevan menurut guru.",
+                    "Hasil retrieval.",
+                    "Skor Cosine Similarity.",
+                    "Keputusan menerima/menolak.",
+                    "Jawaban akhir."
+                ],
+                "evaluasi_retrieval": "Relevansi retrieval dilaporkan melalui persentase pertanyaan yang memiliki setidaknya satu potongan relevan pada hasil retrieval teratas.",
+                "evaluasi_pakar": "Guru menilai jawaban dengan rubrik skala 1 (tidak terpenuhi) sampai 4 (sangat terpenuhi) pada lima dimensi: relevansi, ketepatan isi, kecukupan jawaban, kesetiaan pada sumber, dan ketepatan penolakan. Skor dilaporkan per dimensi dan secara keseluruhan; perbedaan penilaian dibahas jika terdapat lebih dari satu penilai. Evaluasi ini membedakan keberhasilan menemukan konteks dari kualitas jawaban yang dihasilkan model.",
+                "rumus": {
+                    "persentase_pertanyaan_dengan_retrieval_relevan": "(jumlah pertanyaan yang menghasilkan setidaknya satu chunk relevan / jumlah seluruh pertanyaan uji) × 100%",
+                    "persentase_skor_pakar": "(total skor aktual / total skor maksimum) × 100%"
+                },
+                "penetapan_ambang": "Ambang Cosine Similarity ditentukan pada pertanyaan kalibrasi dan tidak disetel ulang setelah hasil jawaban pengujian diketahui. Pengujian akhir menggunakan pertanyaan yang berbeda dari kalibrasi bila data memungkinkan. RAG diperlakukan sebagai strategi untuk meningkatkan keterikatan jawaban pada sumber, bukan jaminan mutlak bebas halusinasi (Li et al., 2025)."
+            },
+            "3.5.4_analisis_data": {
+                "kualitatif": "Data wawancara dan observasi dianalisis deskriptif kualitatif melalui pengelompokan tema (alur pemantauan nilai, kriteria materi tambahan, akses pengguna, ekspektasi jawaban asisten) sebagai dasar spesifikasi kebutuhan.",
+                "kuantitatif": "Data numerik dianalisis deskriptif kuantitatif: metrik klasifikasi LightGBM pada data uji, jumlah dan persentase kasus lulus black-box, serta skor pakar per dimensi dengan jumlah pertanyaan dan ragam kesalahan RAG.",
+                "interpretasi": "Hasil kuantitatif ditafsirkan bersama catatan kualitatif."
+            }
+        }
+    },
+    "daftar_pustaka": [
+        {
+            "penulis": "Abukader, A., Alzubi, A., & Adegboye, O. R.",
+            "tahun": 2025,
+            "judul": "Intelligent System for Student Performance Prediction: An Educational Data Mining Approach Using Metaheuristic-Optimized LightGBM with SHAP-Based Learning Analytics.",
+            "detail": "1–25."
+        },
+        {
+            "penulis": "Adenuga, J. A.",
+            "tahun": 2026,
+            "judul": "Retrieval-augmented generation for pedagogically aware educational AI: an expert-rated comparison of a prompt-only LLM tutor and an integrated, learner-state-aware RAG tutor.",
+            "detail": "August.",
+            "doi": "https://doi.org/10.3389/feduc.2026.1896839"
+        },
+        {
+            "penulis": "Alotaibi, N. F.",
+            "tahun": 2025,
+            "judul": "A Web-based Decision Support Platform for Student Performance Prediction using Machine Learning.",
+            "detail": "2(3), 170–178."
+        },
+        {
+            "penulis": "Falaq, F. I., Nugroho, S., & Paskal, N.",
+            "tahun": 2025,
+            "judul": "PENGEMBANGAN RETRIEVAL-AUGMENTED GENERATION (RAG) CHATBOT MENGGUNAKAN METODE DESIGN THINKING UNTUK",
+            "detail": "Available at: 9(2), 1–10."
+        },
+        {
+            "penulis": "Hajar, M. R., Utami, E., Muhammad, A. H., Hajar, M. R., Utami, E., & Muhammad, A. H.",
+            "tahun": 2025,
+            "judul": "A Systematic Literature Review of Retrieval-Augmented Generation: Methods, Applications, and Future Research Directions.",
+            "jurnal": "Journal of Applied Computer Science and Technology (JACOST)",
+            "detail": "6(2), 115–128."
+        },
+        {
+            "penulis": "Jumar, Mahendra, F., Lusiana, S. V., & Tjahjono, B.",
+            "tahun": 2026,
+            "judul": "RANCANGAN MODEL ASISTEN VIRTUAL BERBASIS RETRIEVAL-AUGMENTED GENERATION UNTUK MENDUKUNG PEMBELAJARAN.",
+            "detail": "11(1), 96–106."
+        },
+        {
+            "penulis": "Li, Z., Wang, Z., Wang, W., Hung, K., Xie, H., & Lee, F.",
+            "tahun": 2025,
+            "judul": "Retrieval-augmented generation for educational application: A systematic survey.",
+            "jurnal": "Computers and Education: Artificial Intelligence",
+            "detail": "8(March), 100417.",
+            "doi": "https://doi.org/10.1016/j.caeai.2025.100417"
+        },
+        {
+            "penulis": "Mustakim, Sari, W. J., & Ulfa, F.",
+            "tahun": 2025,
+            "judul": "Enhancing Student Performance Classification Through Dimensionality Reduction and Feature Selection in Machine Learning.",
+            "detail": "8(3), 717–727."
+        },
+        {
+            "penulis": "Mutezar, A. A., & Salamah, U.",
+            "tahun": 2021,
+            "judul": "Pengembangan Sistem Manajemen Event Pameran Karya Mahasiswa Menggunakan Metode Extreme Programming.",
+            "detail": "5(10), 809–819."
+        },
+        {
+            "penulis": "Németh, R.",
+            "tahun": 2025,
+            "judul": "Exploring the use of retrieval-augmented generation models in higher education: A pilot study on artificial intelligence-based tutoring.",
+            "jurnal": "Social Sciences & Humanities Open",
+            "detail": "12(December 2024).",
+            "doi": "https://doi.org/10.1016/j.ssaho.2025.101751"
+        },
+        {
+            "penulis": "Putra, B. A., Firdaus, R., Putri, A., Dwi, A., & Wati, S.",
+            "tahun": 2026,
+            "judul": "Prediksi Keberhasilan Akademik Siswa Berbasis Fitur Kategorikal Native dengan Explainable AI (SHAP) menggunakan CatBoost vs LightGBM.",
+            "detail": "16(2), 437–444."
+        },
+        {
+            "penulis": "Rani, Y. J. B.",
+            "tahun": 2026,
+            "judul": "Motivation-Aware Learning: An Explainable Machine Learning Approach for Predicting Student Performance and Supporting Personalized Interventions.",
+            "jurnal": "Procedia Computer Science",
+            "detail": "282, 589–598.",
+            "doi": "https://doi.org/10.1016/j.procs.2026.05.106"
+        },
+        {
+            "penulis": "Resika, A. K., Gunantara, N., Sudarma, M., & Sukarsa, M.",
+            "tahun": 2026,
+            "judul": "A SYSTEMATIC LITERATURE REVIEW OF RETRIEVAL-AUGMENTED GENERATION IMPLEMENTATION FOR ENHANCING LARGE LANGUAGE MODELS IN EDUCATION.",
+            "detail": "15(1), 91–109."
+        },
+        {
+            "penulis": "Sulistyo, Dwiyatno, S., Abdillah, H., & Rahmat.",
+            "tahun": 2022,
+            "judul": "Aplikasi sistem informasi akademik berbasis web.",
+            "detail": "9(2)."
+        },
+        {
+            "penulis": "Tsani, R. H.",
+            "tahun": null,
+            "judul": "Perancangan Sistem Informasi Customer Relationship Management Desa Wisata Pentingsari Menggunakan Metode Prototyping."
+        }
+    ]
+}

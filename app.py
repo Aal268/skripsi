@@ -91,8 +91,17 @@ def generate():
             return jsonify({"error": "Data form tidak valid."}), 400
 
         stream = build_docx(data)
-        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        docx_bytes = stream.getvalue()
+
+        # Buat nama file dari judul skripsi
+        judul = data.get("identitas", {}).get("judul", "") or ""
+        safe_judul = re.sub(r'[\\/:*?"<>|\r\n]+', "", judul).strip()
+        safe_judul = re.sub(r'\s+', '_', safe_judul)[:80]  # maks 80 karakter
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        download_name = f"Proposal_{safe_judul}_{timestamp}.docx" if safe_judul else f"Proposal_Skripsi_{timestamp}.docx"
+
+        # Simpan backup ke disk
+        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         existing_numbers = [
             int(match.group(1))
             for path in OUTPUT_DIR.glob("*.docx")
@@ -100,22 +109,38 @@ def generate():
         ]
         number = max(existing_numbers, default=0) + 1
         while True:
-            filename = f"{number:02d}_{timestamp}.docx"
-            output_path = OUTPUT_DIR / filename
+            backup_path = OUTPUT_DIR / f"{number:02d}_{timestamp}.docx"
             try:
-                with output_path.open("xb") as output_file:
-                    output_file.write(stream.getvalue())
+                with backup_path.open("xb") as f:
+                    f.write(docx_bytes)
                 break
             except FileExistsError:
                 number += 1
 
-        return send_file(
-            output_path,
-            as_attachment=True,
-            download_name=output_path.name,
+        # Kirim dari memory stream langsung (hindari masalah path Windows)
+        from io import BytesIO
+        output_stream = BytesIO(docx_bytes)
+        output_stream.seek(0)
+
+        from flask import Response
+        response = Response(
+            output_stream.read(),
+            status=200,
             mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )
+        # Gunakan RFC 5987 encoding untuk nama file agar aman di semua browser
+        from urllib.parse import quote
+        encoded_name = quote(download_name, safe='')
+        response.headers["Content-Disposition"] = (
+            f'attachment; filename="{download_name}"; filename*=UTF-8\'\'{encoded_name}'
+        )
+        response.headers["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        response.headers["X-Download-Filename"] = download_name
+        return response
+
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": f"Gagal membuat dokumen: {e}"}), 500
 
 if __name__ == "__main__":

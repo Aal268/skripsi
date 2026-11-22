@@ -1,0 +1,324 @@
+{
+    "identitas": {
+        "judul": "Pengembangan Platform Pembelajaran Adaptif Berbasis Web Menggunakan Prediksi LightGBM dan Retrieval-Augmented Generation (RAG) di SMAN 1 Kembangbahu",
+        "nama": "AMRUL HAQ AL-BINA’I",
+        "nim": "L200230279",
+        "programStudi": "Teknik Informatika",
+        "fakultas": "Fakultas Komunikasi dan Informatika",
+        "universitas": "Universitas Muhammadiyah Surakarta",
+        "tahun": "2026",
+        "pembimbing": "Endang Wahyu Pamungkas, S.Kom., M.Kom.",
+        "nidn": "-"
+    },
+    "citationStyle": "apa",
+    "chapters": [
+        {
+            "title": "Pendahuluan",
+            "sections": [
+                {
+                    "title": "Latar Belakang Masalah",
+                    "blocks": [
+                        {
+                            "type": "paragraph",
+                            "text": "Penerapan kecerdasan buatan (Artificial Intelligence/AI) dalam pendidikan terus berkembang, tetapi dampaknya terhadap efektivitas pembelajaran masih memerlukan kajian lebih lanjut[cite: 1]. Selain itu, sejumlah sistem pendukung keputusan akademik masih terbatas pada prototipe penelitian atau dasbor institusi dan belum berfokus pada efektivitas intervensi pendidikan[cite: 1]. Kondisi tersebut menunjukkan perlunya sistem yang tidak hanya menyajikan informasi akademik, tetapi juga membantu mengidentifikasi potensi kesulitan belajar siswa sejak dini[cite: 1]. Berdasarkan studi pendahuluan di SMAN 1 Kembangbahu, pemantauan nilai siswa perlu didukung pendekatan berbasis data agar guru dapat memberikan tindak lanjut pembelajaran secara lebih terarah[cite: 1]."
+                        },
+                        {
+                            "type": "paragraph",
+                            "text": "Salah satu pendekatan yang dapat digunakan adalah Educational Data Mining (EDM) melalui algoritma prediktif[cite: 1]. Penelitian mengenai EDM menekankan pentingnya sistem peringatan dini untuk memungkinkan intervensi tepat waktu[cite: 1]. LightGBM memiliki keunggulan dalam kecepatan pelatihan, efisiensi memori, dan pengolahan dataset kompleks[cite: 1]. Penelitian lain melaporkan bahwa LightGBM menghasilkan performa regresi terbaik dengan R² = 0,730, RMSE 1,954, dan MAE 0,803[cite: 1]. Namun, pemilihan algoritma tetap perlu mempertimbangkan karakteristik data, sebagaimana penelitian perbandingan CatBoost dan LightGBM pada prediksi nilai ujian siswa[cite: 1]. Mustakim et al. juga menemukan bahwa PCA tidak selalu meningkatkan performa dibandingkan RFE[cite: 1]. Sementara itu, penelitian optimasi LightGBM menekankan pentingnya penyetelan hiperparameter untuk memperoleh hasil prediksi yang optimal[cite: 1]."
+                        },
+                        {
+                            "type": "paragraph",
+                            "text": "Selain prediksi akademik, siswa membutuhkan pendampingan belajar yang sesuai dengan materi pembelajaran[cite: 1]. Perkembangan Large Language Models (LLM) mendorong terciptanya sistem pembelajaran cerdas yang semakin adaptif[cite: 1]. Akan tetapi, risiko halusinasi, kehilangan konteks, dan bias jawaban menjadi alasan penggunaan Retrieval-Augmented Generation (RAG), yang menggabungkan generasi teks dengan pencarian dokumen eksternal[cite: 1]. Penelitian Falaq et al. melaporkan keberhasilan 100% pada 15 skenario uji black-box dan skor System Usability Scale (SUS) sebesar 74[cite: 1]. RAG juga memungkinkan pengajar mengendalikan sumber literatur yang digunakan model bahasa[cite: 1]. Kajian Hajar et al. (2025) mengidentifikasi tantangan berupa performa retriever, kompleksitas integrasi, dan evaluasi faktualitas[cite: 1]. Oleh karena itu, RAG dengan Google Gemini API dan penyaringan Cosine Similarity dapat diterapkan untuk membantu memastikan jawaban merujuk pada dokumen PDF resmi yang diunggah guru[cite: 1]."
+                        },
+                        {
+                            "type": "paragraph",
+                            "text": "Meskipun prediksi akademik dan RAG telah dikembangkan, integrasi keduanya untuk menghasilkan intervensi pembelajaran yang terarah masih perlu dikaji[cite: 1]. Penelitian LightGBM dengan SHAP menunjukkan bahwa penjelasan prediksi dapat mendukung konseling akademik dan umpan balik berbasis data[cite: 1]. Di sisi lain, penelitian Adenuga (2026) mengidentifikasi trace leakage, yaitu munculnya informasi internal sistem atau label pengambilan dokumen dalam jawaban kepada siswa[cite: 1]. Penelitian mengenai arsitektur RAG juga menekankan pentingnya tahapan pengelolaan dokumen, chunking, embedding, retrieval, generasi, dan evaluasi respons[cite: 1]. Sementara itu, tinjauan literatur berbasis kerangka PICO pada publikasi Scopus dan IEEE periode 2021–2025 menunjukkan perhatian penelitian yang berkelanjutan terhadap RAG[cite: 1]. Temuan tersebut memperkuat kebutuhan akan platform terpadu yang menghubungkan prediksi risiko akademik dengan pendampingan berbasis dokumen, sekaligus mengendalikan relevansi dan keamanan jawaban AI[cite: 1]."
+                        },
+                        {
+                            "type": "paragraph",
+                            "text": "Berdasarkan permasalahan tersebut, penelitian ini mengusulkan \"Pengembangan Platform Pembelajaran Adaptif Berbasis Web Menggunakan Prediksi LightGBM dan Retrieval-Augmented Generation (RAG) di SMAN 1 Kembangbahu\"[cite: 1]. Platform menggunakan riwayat nilai tugas siswa untuk memprediksi potensi ketertinggalan akademik dengan LightGBM, kemudian memberikan rekomendasi modul pembelajaran tambahan berdasarkan hasil prediksi[cite: 1]. Fitur pendampingan belajar dikembangkan menggunakan Google Gemini API dengan arsitektur RAG yang memanfaatkan buku teks atau modul PDF resmi dari guru serta penyaringan relevansi menggunakan Cosine Similarity[cite: 1]. Sistem juga dirancang untuk menolak pertanyaan yang tidak didukung oleh dokumen referensi dan mengevaluasi kualitas jawaban melalui penilaian pakar oleh guru mata pelajaran[cite: 1]. Dengan demikian, penelitian ini diharapkan menghasilkan platform yang mengintegrasikan prediksi akademik dan pendampingan belajar berbasis AI dalam satu sistem pembelajaran adaptif[cite: 1]."
+                        }
+                    ]
+                },
+                {
+                    "title": "Rumusan Masalah",
+                    "blocks": [
+                        {
+                            "type": "list",
+                            "ordered": true,
+                            "items": [
+                                "Bagaimana merancang dan mengimplementasikan algoritma LightGBM ke dalam platform web untuk mendeteksi potensi ketertinggalan akademik siswa SMAN 1 Kembangbahu secara otomatis berdasarkan riwayat nilai tugas?[cite: 1]",
+                                "Bagaimana membangun arsitektur Retrieval-Augmented Generation (RAG) menggunakan Google Gemini API dan filter relevansi semantik (Cosine Similarity) agar fitur tanya jawab sistem merespons secara akurat dan dibatasi hanya pada dokumen PDF yang diunggah oleh guru?[cite: 1]",
+                                "Bagaimana mengintegrasikan kemampuan prediksi ketertinggalan siswa dan asisten tanya jawab cerdas menjadi satu platform pembelajaran adaptif yang mampu merekomendasikan modul intervensi secara proaktif?[cite: 1]",
+                                "Bagaimana mengevaluasi tingkat relevansi dan keakuratan jawaban yang dihasilkan oleh asisten cerdas berbasis RAG menggunakan metode validasi pakar (expert judgement) untuk memastikan mitigasi halusinasi AI?[cite: 1]"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "title": "Batasan Masalah",
+                    "blocks": [
+                        {
+                            "type": "list",
+                            "ordered": false,
+                            "items": [
+                                "Lingkup Platform dan Implementasi: Sistem yang dikembangkan berupa aplikasi berbasis web murni perangkat lunak (software-based), tanpa melibatkan integrasi perangkat keras fisik, yang dirancang khusus untuk studi kasus lingkungan akademik di SMAN 1 Kembangbahu.[cite: 1]",
+                                "Batasan Data Prediksi: Input data yang diproses oleh algoritma Light Gradient Boosting Machine (LightGBM) untuk memprediksi probabilitas ketertinggalan siswa hanya dibatasi pada data historis riwayat nilai tugas akademik siswa.[cite: 1]",
+                                "Tindakan Intervensi Sistem: Otomatisasi tindak lanjut sistem terhadap siswa yang diprediksi akan mengalami kesulitan belajar dibatasi pada pemberian rekomendasi modul atau materi pembelajaran tambahan secara spesifik, bukan dalam bentuk penilaian akhir.[cite: 1]",
+                                "Teknologi Generative AI: Fitur asisten tanya-jawab terintegrasi menggunakan layanan Google Gemini API yang dimodifikasi dengan arsitektur Retrieval-Augmented Generation (RAG) dan difilter menggunakan perhitungan Cosine Similarity.[cite: 1]",
+                                "Restriksi Basis Pengetahuan (Knowledge Base): Sumber pengetahuan untuk menjawab pertanyaan siswa dibatasi secara ketat hanya pada dokumen buku teks atau modul pembelajaran berformat PDF yang diunggah secara resmi oleh guru. Sistem akan memblokir atau menolak menjawab pertanyaan yang berada di luar konteks dokumen referensi tersebut guna mencegah halusinasi AI.[cite: 1]"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "title": "Tujuan Penelitian",
+                    "blocks": [
+                        {
+                            "type": "list",
+                            "ordered": true,
+                            "items": [
+                                "Merancang dan mengimplementasikan algoritma LightGBM ke dalam platform berbasis web untuk mendeteksi potensi ketertinggalan akademik siswa SMAN 1 Kembangbahu secara otomatis dengan memanfaatkan input data riwayat nilai tugas.[cite: 1]",
+                                "Membangun arsitektur Retrieval-Augmented Generation (RAG) menggunakan Google Gemini API yang dilengkapi filter relevansi semantik (Cosine Similarity), sehingga fitur tanya jawab sistem dapat merespons secara akurat dan secara ketat membatasi sumber pengetahuannya hanya pada dokumen PDF yang diunggah oleh guru.[cite: 1]",
+                                "Mengintegrasikan kemampuan deteksi prediktif LightGBM dan asisten cerdas berbasis RAG menjadi satu ekosistem platform pembelajaran adaptif yang terpadu, guna memberikan rekomendasi modul intervensi secara proaktif kepada siswa.[cite: 1]",
+                                "Mengevaluasi tingkat relevansi dan keakuratan respons dari asisten cerdas berbasis RAG melalui validasi pakar (expert judgement) oleh guru mata pelajaran, guna memastikan bahwa jawaban yang diberikan bersumber murni dari dokumen PDF rujukan.[cite: 1]"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "title": "Manfaat Penelitian",
+                    "blocks": [
+                        {
+                            "type": "paragraph",
+                            "text": "Manfaat bagi Siswa:\n- Intervensi Akademik Dini: Membantu siswa mengenali potensi ketertinggalan sejak awal melalui rekomendasi modul pembelajaran adaptif yang disesuaikan dengan kondisi akademiknya.[cite: 1]\n- Pendampingan Belajar Mandiri yang Aman: Menyediakan asisten virtual 24/7 yang mampu menjawab pertanyaan terkait pelajaran secara akurat tanpa risiko halusinasi informasi, karena jawaban bersumber murni dari buku teks atau materi resmi.[cite: 1]\n\nManfaat bagi Guru dan Pihak SMAN 1 Kembangbahu:\n- Efisiensi Evaluasi: Meringankan beban administratif guru dalam memantau rekam jejak akademik, sekaligus memberikan peringatan dini (early warning) terhadap siswa yang membutuhkan perhatian khusus.[cite: 1]\n- Inovasi Pedagogis: Menyediakan alat bantu pengajaran digital (platform data-driven) yang mampu mendukung proses pengambilan keputusan instruksional berbasis data kinerja siswa secara real-time.[cite: 1]\n\nManfaat bagi Pengembangan Ilmu Pengetahuan:\n- Kontribusi Arsitektur Sistem: Menutup kesenjangan literatur dengan membuktikan kelayakan integrasi antara Machine Learning prediktif (LightGBM) sebagai pemicu otomatis dan Generative AI adaptif (RAG dengan filter semantik) dalam satu platform terpadu.[cite: 1]\n- Mitigasi Kelemahan AI Pendidikan: Memberikan wawasan empiris mengenai metode sanitasi output LLM melalui pendekatan RAG dan Cosine Similarity guna mencegah trace leakage pada antarmuka e-learning siswa tingkat menengah.[cite: 1]"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "Tinjauan Pustaka",
+            "sections": [
+                {
+                    "title": "Landasan Teori",
+                    "blocks": [
+                        {
+                            "type": "paragraph",
+                            "text": "Sistem informasi akademik berbasis web mengelola data pendidikan secara efisien[cite: 1]. Pada ranah pemrosesan datanya, algoritma LightGBM yang terintegrasi di backend menawarkan kecepatan tinggi dan efisiensi memori[cite: 1]. Hal ini dicapai melalui pertumbuhan pohon secara leaf-wise dan teknik efisiensi komputasi Gradient-based One-Side Sampling (GOSS)[cite: 1]."
+                        },
+                        {
+                            "type": "paragraph",
+                            "text": "Retrieval-Augmented Generation (RAG) menekan halusinasi AI dengan melampirkan konteks eksternal kepada model bahasa[cite: 1]. Alurnya mencakup chunking dokumen, pembuatan vektor embedding, penyimpanan di Vector Database, pencarian (retrieval), dan generation[cite: 1]. Pada fase pencarian, tingkat relevansi kueri siswa dan potongan PDF diukur dengan Cosine Similarity:\n\nCosine Similarity(A, B) = (A · B) / (‖A‖ × ‖B‖)\n\nSistem menggunakan threshold (ambang batas) dari hasil perhitungan ini untuk menolak pertanyaan siswa yang keluar dari topik PDF[cite: 1]."
+                        },
+                        {
+                            "type": "paragraph",
+                            "text": "Pembelajaran adaptif menyesuaikan intervensi dengan kondisi siswa[cite: 1]. Pada platform ini, intervensi direalisasikan melalui pemberian modul ekstra berdasarkan skor risiko ketertinggalan LightGBM, serta fasilitas tanya jawab spesifik-dokumen (RAG)[cite: 1]."
+                        }
+                    ]
+                },
+                {
+                    "title": "Penelitian Terdahulu",
+                    "blocks": [
+                        {
+                            "type": "table",
+                            "tableInputMode": "text",
+                            "tableText": "Aspek | (Ai & Learning, 2025) / Falaq et al. | (Abukader et al., 2025); (Alotaibi & Performance, 2025) | Penelitian yang Diusulkan\nFokus | Chatbot RAG untuk belajar mandiri. | Prediksi akademik berbasis ML. | Platform adaptif (integrasi prediksi ML + pendampingan RAG).\nMetode | RAG (Gemini). | LightGBM. | LightGBM (Prediksi) & Gemini API RAG (Q&A).\nData/Referensi | Pengetahuan umum dokumen. | Dataset riwayat nilai. | Nilai tugas siswa & PDF resmi guru.\nTindak Lanjut | Asisten pasif (hanya menjawab). | Berhenti di metrik pengujian. | Intervensi modul otomatis berdasarkan skor ML."
+                        },
+                        {
+                            "type": "paragraph",
+                            "text": "Penelitian terdahulu memisahkan prediksi kinerja akademik dan asisten RAG[cite: 1]. Sistem ini menjembatani keduanya: prediksi LightGBM difungsikan sebagai pemicu otomatis rekomendasi modul, sementara RAG memberikan pendampingan yang pengetahuannya disaring ketat melalui Cosine Similarity[cite: 1]. Celah riset yang diisi oleh penelitian ini adalah peleburan ML prediktif dan AI generatif, menciptakan sistem proaktif yang tak hanya menjawab kueri, tapi mendeteksi siswa tertinggal dan membatasi halusinasi melalui perhitungan matematis[cite: 1]."
+                        }
+                    ]
+                },
+                {
+                    "title": "Kerangka Pemikiran",
+                    "blocks": [
+                        {
+                            "type": "paragraph",
+                            "text": "Alur kerangka berpikir penelitian ini beroperasi dalam 4 tahap sistematis[cite: 1]:\n1. Input Data: Mengumpulkan riwayat nilai tugas siswa dan modul referensi (PDF) milik guru.[cite: 1]\n2. Pemrosesan ML: LightGBM memprediksi tingkat probabilitas ketertinggalan akademik siswa.[cite: 1]\n3. Intervensi AI (RAG): Siswa berisiko akan diarahkan ke modul intervensi. Pertanyaan mereka dijawab oleh Gemini API, dengan filter Cosine Similarity untuk menolak kueri di luar konteks (trace leakage mitigation).[cite: 1]\n4. Evaluasi: Mengukur akurasi prediktif LightGBM secara kuantitatif dan memvalidasi keakuratan jawaban RAG melalui expert judgement (guru).[cite: 1]"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "Metodologi Penelitian",
+            "sections": [
+                {
+                    "title": "Desain Penelitian",
+                    "blocks": [
+                        {
+                            "type": "paragraph",
+                            "text": "Penelitian ini menggunakan desain penelitian dan pengembangan (Research and Development/R&D) berbasis software engineering untuk membangun platform e-learning adaptif web-based[cite: 1]. Tahapan utama mencakup pengumpulan data riwayat nilai dan modul PDF guru, pelatihan model prediksi LightGBM, pembangunan pipeline RAG dengan Gemini API dan Cosine Similarity, integrasi ke platform web, serta evaluasi sistem[cite: 1]."
+                        }
+                    ]
+                },
+                {
+                    "title": "Objek, Subjek, dan Data Penelitian",
+                    "blocks": [
+                        {
+                            "type": "paragraph",
+                            "text": "Objek penelitian adalah platform e-learning adaptif berbasis web[cite: 1]. Subjek penelitian adalah siswa dan guru mata pelajaran di SMAN 1 Kembangbahu[cite: 1]. Data penelitian terdiri dari data kuantitatif berupa riwayat nilai tugas siswa untuk model LightGBM dan data tekstual berformat PDF (buku teks/modul pembelajaran resmi) sebagai basis pengetahuan RAG[cite: 1]."
+                        }
+                    ]
+                },
+                {
+                    "title": "Variabel atau Fokus Penelitian",
+                    "blocks": [
+                        {
+                            "type": "table",
+                            "tableInputMode": "text",
+                            "tableText": "Variabel/Fokus | Definisi Operasional | Indikator | Sumber atau Instrumen\nProbabilitas Ketertinggalan | Nilai estimasi potensi kegagalan/ketertinggalan akademik siswa yang dihitung model LightGBM | Skor probabilitas (0–1), nilai RMSE, MAE, R² | Riwayat nilai tugas siswa SMAN 1 Kembangbahu\nRelevansi & Keakuratan RAG | Kesesuaian jawaban asisten cerdas Gemini API dengan konteks dokumen PDF referensi | Skor Cosine Similarity, tingkat relevansi jawaban (Expert Judgement) | Dokumen PDF guru & lembar penilaian pakar (guru)"
+                        }
+                    ]
+                },
+                {
+                    "title": "Instrumen atau Komponen Penelitian",
+                    "blocks": [
+                        {
+                            "type": "table",
+                            "tableInputMode": "text",
+                            "tableText": "Komponen/Instrumen | Fungsi | Spesifikasi atau Prosedur\nLightGBM Engine | Memprediksi probabilitas ketertinggalan siswa | Algoritma Gradient Boosting (Leaf-wise & GOSS) pada backend\nGoogle Gemini API & RAG | Menjawab kueri siswa berdasarkan modul PDF | Embeddings, Vector Search & LLM Generation\nCosine Similarity Filter | Menyaring relevansi kueri/dokumen & mencegah halusinasi | Threshold filtering nilai Cosine Similarity\nLembar Validasi Pakar | Evaluasi keakuratan dan kebenaran jawaban AI | Form penilaian Expert Judgement oleh guru mata pelajaran"
+                        }
+                    ]
+                },
+                {
+                    "title": "Prosedur Penelitian",
+                    "blocks": [
+                        {
+                            "type": "list",
+                            "ordered": true,
+                            "items": [
+                                "Tahap persiapan: Pengumpulan dataset riwayat nilai tugas siswa SMAN 1 Kembangbahu dan pengunggahan modul/buku teks PDF resmi oleh guru.[cite: 1]",
+                                "Tahap pengembangan: Pelatihan model LightGBM, implementasi pipeline RAG dengan Google Gemini API, dan integrasi filter semantik Cosine Similarity pada platform web.[cite: 1]",
+                                "Tahap pengolahan dan evaluasi: Menguji performa prediktif LightGBM serta menguji relevansi dan keakuratan jawaban RAG melalui validasi pakar (guru).[cite: 1]"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "title": "Teknik Analisis Data",
+                    "blocks": [
+                        {
+                            "type": "paragraph",
+                            "text": "Analisis data prediktif LightGBM dievaluasi menggunakan metrik performa regresi seperti Root Mean Square Error (RMSE), Mean Absolute Error (MAE), dan koefisien determinasi (R²)[cite: 1]. Untuk fitur tanya jawab RAG, keakuratan dan relevansi jawaban dievaluasi menggunakan metode Expert Judgement oleh guru mata pelajaran guna memastikan tidak ada halusinasi atau informasi di luar dokumen PDF referensi[cite: 1]."
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "referensi": [
+        "Abukader, A., Alzubi, A., & Adegboye, O. R. (2025). Intelligent System for Student Performance Prediction : An Educational Data Mining Approach Using Metaheuristic-Optimized LightGBM with SHAP-Based Learning Analytics. 1–25.[cite: 1]",
+        "Adenuga, J. A. (2026). Retrieval-augmented generation for pedagogically aware educational AI : an expert-rated comparison of a prompt-only LLM tutor and an integrated , learner-state-aware RAG tutor. August. https://doi.org/10.3389/feduc.2026.1896839[cite: 1]",
+        "Alotaibi, N. F., & Performance, S. (2025). A Web-based Decision Support Platform for Student Performance Prediction using Machine Learning. 2(3), 170–178.[cite: 1]",
+        "Article, R. (2025). Social Sciences & Humanities Open Exploring the use of retrieval-augmented generation models in higher education : A pilot study on artificial intelligence-based tutoring. 12(June). https://doi.org/10.1016/j.ssaho.2025.101751[cite: 1]",
+        "Di, M., & Tinggi, P. (2026). RANCANGAN MODEL ASISTEN VIRTUAL BERBASIS RETRIEVAL- AUGMENTED GENERATION UNTUK MENDUKUNG PEMBELAJARAN. 11(1), 96–106.[cite: 1]",
+        "Gunantara, N., Sudarma, M., & Sukarsa, M. (2026). A SYSTEMATIC LITERATURE REVIEW OF RETRIEVAL-AUGMENTED GENERATION IMPLEMENTATION FOR ENHANCING LARGE LANGUAGE MODELS IN EDUCATION. 15(1), 91–109.[cite: 1]",
+        "Hajar, M. R., Utami, E., Muhammad, A. H., Hajar, M. R., Utami, E., & Muhammad, A. H. (2025). JOURNAL OF APPLIED COMPUTER SCIENCE AND TECHNOLOGY ( JACOST ) A Systematic Literature Review of Retrieval-Augmented Generation : Methods , Applications , and Future Research Directions. 6(2), 115–128.[cite: 1]",
+        "Putra, B. A., Firdaus, R., Putri, A., Dwi, A., & Wati, S. (2026). Prediksi Keberhasilan Akademik Siswa Berbasis Fitur Kategorikal Native dengan Explainable AI ( SHAP ) menggunakan CatBoost vs Light GBM. 16(2), 437–444.[cite: 1]",
+        "Rani, Y. J. B. (2026). ScienceDirect Motivation-Aware Learning : An Explainable Machine Learning Approach for Predicting Student Performance and Supporting Personalized Interventions. Procedia Computer Science, 282, 589–598. https://doi.org/10.1016/j.procs.2026.05.106[cite: 1]"
+    ],
+    "sources": [
+        {
+            "id": "sumber-1",
+            "title": "Intelligent System for Student Performance Prediction : An Educational Data Mining Approach Using Metaheuristic-Optimized LightGBM with SHAP-Based Learning Analytics",
+            "authors": "Abukader, A.; Alzubi, A.; Adegboye, O. R.",
+            "year": "2025",
+            "journal": "",
+            "volume": "",
+            "issue": "",
+            "pages": "1–25",
+            "doi": ""
+        },
+        {
+            "id": "sumber-2",
+            "title": "Retrieval-augmented generation for pedagogically aware educational AI : an expert-rated comparison of a prompt-only LLM tutor and an integrated , learner-state-aware RAG tutor",
+            "authors": "Adenuga, J. A.",
+            "year": "2026",
+            "journal": "Frontiers in Education",
+            "volume": "",
+            "issue": "",
+            "pages": "",
+            "doi": "10.3389/feduc.2026.1896839"
+        },
+        {
+            "id": "sumber-3",
+            "title": "A Web-based Decision Support Platform for Student Performance Prediction using Machine Learning",
+            "authors": "Alotaibi, N. F.",
+            "year": "2025",
+            "journal": "",
+            "volume": "2",
+            "issue": "3",
+            "pages": "170–178",
+            "doi": ""
+        },
+        {
+            "id": "sumber-4",
+            "title": "Exploring the use of retrieval-augmented generation models in higher education : A pilot study on artificial intelligence-based tutoring",
+            "authors": "Article, R.",
+            "year": "2025",
+            "journal": "Social Sciences & Humanities Open",
+            "volume": "12",
+            "issue": "",
+            "pages": "",
+            "doi": "10.1016/j.ssaho.2025.101751"
+        },
+        {
+            "id": "sumber-5",
+            "title": "RANCANGAN MODEL ASISTEN VIRTUAL BERBASIS RETRIEVAL- AUGMENTED GENERATION UNTUK MENDUKUNG PEMBELAJARAN",
+            "authors": "Di, M.; Tinggi, P.",
+            "year": "2026",
+            "journal": "",
+            "volume": "11",
+            "issue": "1",
+            "pages": "96–106",
+            "doi": ""
+        },
+        {
+            "id": "sumber-6",
+            "title": "A SYSTEMATIC LITERATURE REVIEW OF RETRIEVAL-AUGMENTED GENERATION IMPLEMENTATION FOR ENHANCING LARGE LANGUAGE MODELS IN EDUCATION",
+            "authors": "Gunantara, N.; Sudarma, M.; Sukarsa, M.",
+            "year": "2026",
+            "journal": "",
+            "volume": "15",
+            "issue": "1",
+            "pages": "91–109",
+            "doi": ""
+        },
+        {
+            "id": "sumber-7",
+            "title": "A Systematic Literature Review of Retrieval-Augmented Generation : Methods , Applications , and Future Research Directions",
+            "authors": "Hajar, M. R.; Utami, E.; Muhammad, A. H.",
+            "year": "2025",
+            "journal": "JOURNAL OF APPLIED COMPUTER SCIENCE AND TECHNOLOGY ( JACOST )",
+            "volume": "6",
+            "issue": "2",
+            "pages": "115–128",
+            "doi": ""
+        },
+        {
+            "id": "sumber-8",
+            "title": "Prediksi Keberhasilan Akademik Siswa Berbasis Fitur Kategorikal Native dengan Explainable AI ( SHAP ) menggunakan CatBoost vs Light GBM",
+            "authors": "Putra, B. A.; Firdaus, R.; Putri, A.; Dwi, A.; Wati, S.",
+            "year": "2026",
+            "journal": "",
+            "volume": "16",
+            "issue": "2",
+            "pages": "437–444",
+            "doi": ""
+        },
+        {
+            "id": "sumber-9",
+            "title": "Motivation-Aware Learning : An Explainable Machine Learning Approach for Predicting Student Performance and Supporting Personalized Interventions",
+            "authors": "Rani, Y. J. B.",
+            "year": "2026",
+            "journal": "Procedia Computer Science",
+            "volume": "282",
+            "issue": "",
+            "pages": "589–598",
+            "doi": "10.1016/j.procs.2026.05.106"
+        }
+    ]
+}

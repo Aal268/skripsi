@@ -1274,11 +1274,27 @@ async function generateDocx() {
     }
     const blob = await res.blob();
     const disposition = res.headers.get("Content-Disposition") || "";
-    const match = disposition.match(/filename="?([^"]+)"?/);
-    const filename = match ? match[1] : "Proposal_Skripsi.docx";
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url);
-    toast(`DOCX ${filename} tersimpan di folder hasil generate.`);
+    // Coba RFC 5987 format: filename*=UTF-8''...
+    let filename = "";
+    const rfc5987Match = disposition.match(/filename\*=UTF-8''([^\s;]+)/i);
+    if (rfc5987Match) {
+      try { filename = decodeURIComponent(rfc5987Match[1]); } catch { filename = rfc5987Match[1]; }
+    }
+    // Fallback ke filename="..." biasa
+    if (!filename) {
+      const plainMatch = disposition.match(/filename="?([^";]+)"?/i);
+      filename = plainMatch ? plainMatch[1].trim() : "";
+    }
+    // Fallback ke custom header
+    if (!filename) filename = res.headers.get("X-Download-Filename") || "";
+    // Fallback terakhir
+    if (!filename) filename = "Proposal_Skripsi.docx";
+    // Pastikan ekstensi .docx
+    if (!filename.toLowerCase().endsWith(".docx")) filename += ".docx";
+    const url = URL.createObjectURL(new Blob([blob], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" }));
+    const a = document.createElement("a"); a.href = url; a.download = filename; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    toast(`✅ DOCX berhasil diunduh: ${filename}`);
   } catch (err) {
     toast(err.message || "Python generator belum berjalan.");
   } finally {
